@@ -41,30 +41,34 @@
 
             <div id="config" class="card p-6">
                 <div class="flex items-center justify-between gap-3">
-                    <div class="text-sm font-extrabold">Визуальный подбор</div>
-                    <div class="text-xs text-slate-500">без сборки • работает на компрессоре</div>
+                    <div class="text-sm font-extrabold">Подбор цвета покрытия</div>
+                    <div class="text-xs text-slate-500">размер влияет на цену, покрытие — на визуализацию</div>
                 </div>
 
                 <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {{-- Блок с размерами/цветами/ценой --}}
                     <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 order-2 sm:order-1">
-                        <div class="text-xs font-bold text-slate-600">Размер</div>
+                        <div class="text-xs font-bold text-slate-600">Размер диска</div>
                         <div class="mt-2 flex flex-wrap gap-2">
                             @foreach($sizes as $i => $s)
                                 <button type="button"
                                         class="chip {{ $i===0 ? 'chip-active' : '' }}"
-                                        data-size-index="{{ $i }}">
+                                        data-size-index="{{ $i }}"
+                                        aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
                                     {{ $s['label'] }}
                                 </button>
                             @endforeach
                         </div>
+
+                        <p class="mt-2 text-xs leading-relaxed text-slate-500">Размер используется для расчёта. На иллюстрации не меняется модель или геометрия диска.</p>
 
                         <div class="mt-4 text-xs font-bold text-slate-600">Покрытие</div>
                         <div class="mt-2 flex flex-wrap gap-2">
                             @foreach($finishes as $i => $f)
                                 <button type="button"
                                         class="chip {{ $i===0 ? 'chip-active' : '' }}"
-                                        data-finish-index="{{ $i }}">
+                                        data-finish-index="{{ $i }}"
+                                        aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
                                     {{ $f['name'] }}
                                 </button>
                             @endforeach
@@ -82,7 +86,7 @@
                     </div>
 
                     <div class="rounded-2xl bg-white border border-slate-200 p-4 order-1 sm:order-2">
-                        <div class="text-xs font-bold text-slate-600">Превью</div>
+                        <div class="text-xs font-bold text-slate-600">Визуализация цвета</div>
 
                         <div class="mt-3 relative aspect-square w-full grid place-items-center overflow-hidden rounded-2xl bg-slate-50 border border-slate-200">
                             <img id="wheelImg"
@@ -90,11 +94,12 @@
                                  alt="Диск"
                                  class="w-[88%] h-[88%] object-contain"
                                  style="mix-blend-mode:multiply; filter:brightness(1) contrast(1.08);">
-<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs">
+                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs">
                                 <span id="sizeTag" class="chip bg-white/80 backdrop-blur">{{ $sizes[0]['label'] }}</span>
                                 <span id="finishTag" class="chip bg-white/80 backdrop-blur">{{ $finishes[0]['name'] }}</span>
                             </div>
                         </div>
+                        <p class="mt-3 text-xs leading-relaxed text-slate-500">Условный диск показывает оттенок покрытия. Точный вид зависит от модели, фактуры и освещения.</p>
 
                         <div class="mt-4 flex gap-3">
                             <a href="#contact" class="btn-primary w-full text-center">Записаться</a>
@@ -136,21 +141,33 @@
 <section id="works" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="flex items-end justify-between gap-6 flex-wrap">
         <div>
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Работы</h2>
-            <p class="mt-2 text-slate-600">До/после и процесс — реальные примеры из мастерской.</p>
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Варианты покрытия</h2>
+            <p class="mt-2 text-slate-600 max-w-2xl">Посмотрите оттенки на условном диске. Галерею реальных работ «до/после» добавим, когда будут фотографии из мастерской.</p>
+        </div>
+        <div class="flex items-center gap-2" aria-label="Прокрутка вариантов покрытия">
+            <button type="button" class="btn-ghost !px-3 !py-2" data-slider-direction="-1" aria-label="Предыдущий вариант">←</button>
+            <button type="button" class="btn-ghost !px-3 !py-2" data-slider-direction="1" aria-label="Следующий вариант">→</button>
         </div>
     </div>
 
-    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-        @for ($i = 1; $i <= 8; $i++)
-            <button type="button" class="group rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
-                    data-job-full="{{ asset('images/Job/' . $i . '.jpg') }}" aria-label="Открыть фото {{ $i }}">
-                <img src="{{ asset('images/Job/' . $i . '.jpg') }}"
-                     alt="Работа {{ $i }}"
-                     class="w-full h-40 md:h-44 object-cover transition-transform duration-300 group-hover:scale-105">
-            </button>
-        @endfor
+    <div id="coatingSlider" class="coating-slider mt-8 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4" aria-label="Варианты покрытия">
+        @foreach($finishes as $i => $finish)
+            <article class="coating-slide card w-[82vw] max-w-[360px] shrink-0 snap-start p-5 sm:w-[340px]">
+                <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 grid place-items-center">
+                    <img src="{{ asset('images/R15/' . $finish['file']) }}"
+                         alt="{{ $finish['name'] }} — визуализация покрытия"
+                         class="h-[88%] w-[88%] object-contain"
+                         loading="lazy"
+                         style="mix-blend-mode:multiply; filter:brightness(1) contrast(1.08);">
+                </div>
+                <p class="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Покрытие</p>
+                <h3 class="mt-1 text-lg font-extrabold text-slate-900">{{ $finish['name'] }}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">Визуализация оттенка на условном диске.</p>
+                <button type="button" class="btn-ghost mt-4 w-full text-sm" data-coating-index="{{ $i }}">Выбрать в подборе</button>
+            </article>
+        @endforeach
     </div>
+    <p class="mt-2 text-sm text-slate-500 sm:hidden">Листайте варианты в сторону.</p>
 </section>
 
 <!-- Lightbox -->
@@ -289,7 +306,7 @@
     const finishTag = document.getElementById('finishTag');
     const priceLabel = document.getElementById('priceLabel');
 
-    // Lightbox (для превью диска и галереи работ)
+    // Lightbox для увеличения иллюстрации покрытия.
     const lb = document.getElementById('lightbox');
     const lbImg = document.getElementById('lightboxImg');
 
@@ -305,33 +322,16 @@
         }
     }
 
-    function getFolderFromSize(s) {
-        if (s.folder) return s.folder; // например "images/R15"
-        if (s.img) {
-            // например "https://site.ru/images/R15/g.png" или "/images/R15/g.png"
-            return s.img.replace(/\/[^\/]+$/, '');
-        }
-        return 'images/R15';
-    }
-
     function renderPreview() {
         const s = SIZES[activeSize];
         const f = FINISHES[activeFinish];
-
-        const folder = getFolderFromSize(s);
         const filename = f.file || 'g.png';
+        const src = joinUrl("{{ rtrim(asset('images/R15'), '/') }}", filename);
 
-        // Если folder абсолютный URL, используем URL-конструктор
-        let src;
-        if (/^https?:\/\//i.test(folder)) {
-            src = joinUrl(folder, filename);
-        } else {
-            // folder может быть "images/R15" или "/images/R15"
-            const norm = folder.startsWith('/') ? folder.slice(1) : folder;
-            src = joinUrl("{{ rtrim(asset(''), '/') }}", norm + '/' + filename);
+        if (wheelImg && wheelImg.dataset.finish !== filename) {
+            wheelImg.src = src;
+            wheelImg.dataset.finish = filename;
         }
-
-        wheelImg.src = src;
 
         sizeTag.textContent = s.label || 'R15';
         finishTag.textContent = f.name || 'Оригинал';
@@ -344,8 +344,12 @@
     // Кнопки размеров
     document.querySelectorAll('[data-size-index]').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-size-index]').forEach(b => b.classList.remove('chip-active'));
+            document.querySelectorAll('[data-size-index]').forEach(b => {
+                b.classList.remove('chip-active');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('chip-active');
+            btn.setAttribute('aria-pressed', 'true');
             activeSize = Number(btn.dataset.sizeIndex);
             renderPreview();
         });
@@ -354,8 +358,12 @@
     // Кнопки покрытий
     document.querySelectorAll('[data-finish-index]').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-finish-index]').forEach(b => b.classList.remove('chip-active'));
+            document.querySelectorAll('[data-finish-index]').forEach(b => {
+                b.classList.remove('chip-active');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('chip-active');
+            btn.setAttribute('aria-pressed', 'true');
             activeFinish = Number(btn.dataset.finishIndex);
             renderPreview();
         });
@@ -387,13 +395,23 @@
         });
     }
 
-    // Галерея работ: клик по миниатюре -> lightbox
-    document.querySelectorAll('[data-job-full]').forEach(el => {
-        el.addEventListener('click', () => {
-            if (!lb || !lbImg) return;
-            lbImg.src = el.dataset.jobFull;
-            lb.classList.remove('hidden');
-            lb.classList.add('flex');
+    const coatingSlider = document.getElementById('coatingSlider');
+    document.querySelectorAll('[data-slider-direction]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!coatingSlider) return;
+            coatingSlider.scrollBy({
+                left: Number(btn.dataset.sliderDirection) * coatingSlider.clientWidth * 0.82,
+                behavior: 'smooth',
+            });
+        });
+    });
+
+    document.querySelectorAll('[data-coating-index]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = Number(btn.dataset.coatingIndex);
+            const finishButton = document.querySelector(`[data-finish-index="${index}"]`);
+            if (finishButton) finishButton.click();
+            document.getElementById('config')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
 

@@ -71,3 +71,17 @@
   border-radius: 1rem;
   padding: 1rem;
 }
+
+.coating-slider {
+  scrollbar-color: #fdba74 transparent;
+  scrollbar-width: thin;
+}
+
+.coating-slider::-webkit-scrollbar {
+  height: 8px;
+}
+
+.coating-slider::-webkit-scrollbar-thumb {
+  background: #fdba74;
+  border-radius: 999px;
+}

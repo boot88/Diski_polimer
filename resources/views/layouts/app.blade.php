@@ -63,7 +63,7 @@
             <div class="hidden md:flex items-center gap-6">
                 <a href="#services" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Услуги</a>
                 <a href="#config" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Подбор</a>
-                <a href="#works" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Работы</a>
+                <a href="#works" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Покрытия</a>
                 <a href="#reviews" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Отзывы</a>
                 <a href="#contact" class="text-sm font-semibold text-slate-700 hover:text-slate-900">Контакты</a>
                 <a href="tel:+79138954525" class="btn-ghost text-sm">+7 (913) 895‑45‑25</a>
@@ -80,7 +80,7 @@
             <div class="flex flex-col gap-2 pt-2">
                 <a href="#services" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Услуги</a>
                 <a href="#config" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Подбор</a>
-                <a href="#works" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Работы</a>
+                <a href="#works" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Покрытия</a>
                 <a href="#reviews" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Отзывы</a>
                 <a href="#contact" class="px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold">Контакты</a>
             </div>

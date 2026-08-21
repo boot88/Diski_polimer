@@ -14,7 +14,10 @@ class ExampleTest extends TestCase
 
         $response = $this->get(route('home'));
 
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertSee('Варианты покрытия')
+            ->assertSee('Размер используется для расчёта');
     }
 
     public function test_valid_lead_is_sent_with_configured_recipient(): void
