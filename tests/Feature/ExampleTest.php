@@ -2,18 +2,53 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Mail\LeadRequestMail;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_home_page_is_available(): void
     {
-        $response = $this->get('/');
+        $this->withoutVite();
 
-        $response->assertStatus(200);
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+    }
+
+    public function test_valid_lead_is_sent_with_configured_recipient(): void
+    {
+        Mail::fake();
+        config()->set('mail.lead_to_address', 'leads@example.test');
+
+        $response = $this->postJson(route('lead.send'), [
+            'name' => 'Иван Петров',
+            'phone' => '+7 (913) 895-45-25',
+            'message' => 'Нужна покраска комплекта дисков.',
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('status', 'ok');
+
+        Mail::assertSent(LeadRequestMail::class, function (LeadRequestMail $mail): bool {
+            return $mail->hasTo('leads@example.test');
+        });
+    }
+
+    public function test_phone_number_requires_at_least_seven_digits(): void
+    {
+        Mail::fake();
+
+        $response = $this->postJson(route('lead.send'), [
+            'phone' => '+7---',
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('phone');
+
+        Mail::assertNothingSent();
     }
 }

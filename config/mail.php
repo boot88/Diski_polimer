@@ -115,4 +115,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    // Адрес получателя заявок. Он может отличаться от адреса отправителя.
+    'lead_to_address' => env('LEAD_TO_EMAIL', env('MAIL_FROM_ADDRESS')),
+
 ];

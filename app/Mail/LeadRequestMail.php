@@ -19,7 +19,7 @@ class LeadRequestMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Новая заявка с сайта Sandblasting')
+        return $this->subject('Новая заявка с сайта PolymerDisk')
             ->view('emails.lead_request')
             ->with(['lead' => $this->lead]);
     }

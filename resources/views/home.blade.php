@@ -3,23 +3,6 @@
 
 @section('content')
 
-@php
-    $sizes = $sizes ?? [
-        ['label' => 'R15', 'folder' => 'images/R15', 'price' => 14400],  //dfgdf
-        ['label' => 'R17', 'folder' => 'images/R15', 'price' => 16400],  //{{-- R17 --}}
-        ['label' => 'R19', 'folder' => 'images/R15', 'price' => 18400],  //{{-- R19 --}}
-    ];
-
-    $finishes = $finishes ?? [
-        ['key' => 'base',       'name' => 'Оригинал',           'file' => 'g_small.jpg'],
-        ['key' => 'gloss',      'name' => 'Глянцевый чёрный',   'file' => 'g_g_small.jpg'],
-        ['key' => 'matte',      'name' => 'Матовый чёрный',     'file' => 'g_m_small.jpg'],
-        ['key' => 'silver',     'name' => 'Серебро',            'file' => 'g_s_small.jpg'],
-        ['key' => 'anthracite', 'name' => 'Антрацит',           'file' => 'g_a_small.jpg'],
-        ['key' => 'bronze',     'name' => 'Бронза',             'file' => 'g_b_small.jpg'],
-    ];
-@endphp
-
 <section class="bg-gradient-to-b from-white to-slate-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-14">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">

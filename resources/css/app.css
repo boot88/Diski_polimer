@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Временно заменим все bg-primary-500 на конкретные цвета */
 .btn-primary {
@@ -24,7 +22,6 @@
     background-color: white;
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
     border: 1px solid #e5e7eb; /* neutral-200 */
 }
 

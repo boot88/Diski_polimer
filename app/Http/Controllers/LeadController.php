@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\LeadRequestMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -22,8 +23,8 @@ class LeadController extends Controller
                 'required',
                 'string',
                 'max:20',
-                // Цифры, пробел, + - ( )
-                'regex:/^[0-9+\-\s()]+$/',
+                // Цифры, пробел, + - ( ) и минимум семь цифр.
+                'regex:/^(?=(?:\D*\d){7,})[0-9+\-\s()]+$/',
             ],
             'message' => [
                 'nullable',
@@ -44,12 +45,7 @@ class LeadController extends Controller
         ];
 
         try {
-            // HTML-письмо по шаблону emails.lead_request
-            Mail::send('emails.lead_request', ['lead' => $lead], function ($message) {
-                $message
-                    ->to('povisok888@gmail.com')
-                    ->subject('Новая заявка с сайта PolymerDisk');
-            });
+            Mail::to(config('mail.lead_to_address'))->send(new LeadRequestMail($lead));
         } catch (\Throwable $e) {
             // Логируем, но пользователю лишних подробностей не показываем
             report($e);
