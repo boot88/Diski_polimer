@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Mail;
+=======
+>>>>>>> 940e35ecfb49a7c334f9e6f870acf7eea0daf4ac
 
 class HomeController extends Controller
 {
     public function index()
     {
+<<<<<<< HEAD
         // 3 размера (картинки — внешние ссылки; лучше заменить на локальные public/images/*)
         $sizes = [
             ['label' => 'R15', 'folder' => 'images/R15', 'price' => 14400],
@@ -63,4 +67,8 @@ class HomeController extends Controller
             
             return back()->with('ok', 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.');
         }
+=======
+        return view('home');
+    }
+>>>>>>> 940e35ecfb49a7c334f9e6f870acf7eea0daf4ac
 }
