@@ -1,302 +1,300 @@
-{{-- resources/views/home.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
+<section class="hero-section" aria-labelledby="hero-title">
+    <img src="{{ asset('images/brand/hero-workshop.webp') }}"
+         alt="Мастер проверяет покрытие автомобильного диска"
+         class="hero-image"
+         width="1599"
+         height="900"
+         fetchpriority="high">
+    <div class="hero-overlay"></div>
 
-<section class="bg-gradient-to-b from-white to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-14">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+    <div class="container-wide hero-content">
+        <div class="hero-copy">
+            <p class="eyebrow eyebrow-light"><span></span> Порошковая покраска · Бердск</p>
+            <h1 id="hero-title">Возвращаем дискам точную форму и <em>сильное покрытие</em></h1>
+            <p class="hero-lead">Полная подготовка поверхности, порошковая окраска и контроль финиша. Работаем с комплектами R15–R19 и подбираем оттенок под автомобиль.</p>
+
+            <div class="hero-actions">
+                <a href="#contact" class="button button-accent">Рассчитать по фото</a>
+                <a href="#config" class="button button-light">Подобрать покрытие</a>
+            </div>
+
+            <div class="hero-meta" aria-label="Основные условия">
+                <div><strong>от 14 400 ₽</strong><span>комплект из 4 дисков</span></div>
+                <div><strong>R15–R19</strong><span>легковые диски</span></div>
+                <div><strong>Бердск</strong><span>пер. Промышленный, 2а/4</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="trust-strip" aria-label="Преимущества">
+    <div class="container-wide trust-grid">
+        <div><span>01</span><p><strong>Подготовка металла</strong>Снимаем старое покрытие и коррозию</p></div>
+        <div><span>02</span><p><strong>Ровный финиш</strong>Порошок без подтёков и непрокрасов</p></div>
+        <div><span>03</span><p><strong>Понятная смета</strong>Оцениваем состояние до начала работ</p></div>
+    </div>
+</section>
+
+<section id="services" class="section section-light">
+    <div class="container-wide">
+        <div class="section-heading">
             <div>
-                <div class="inline-flex items-center gap-2 chip">
-                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-600 font-semibold">Быстрая запись • Бердск</span>
-                </div>
-                <h1 class="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
-                    Полимерная покраска дисков <span class="text-orange-500">с подбором цвета</span>
-                </h1>
-                <p class="mt-4 text-slate-600 leading-relaxed max-w-xl">
-                    Обновим внешний вид и защитим диски от коррозии. Ниже — простой конфигуратор: выберите размер и цвет, и увидите пример результата + ориентировочную стоимость за комплект 4 дисков.
-                </p>
-
-                <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="#config" class="btn-primary">Подобрать цвет</a>
-                    <a href="#contact" class="btn-ghost">Узнать срок и цену</a>
-                </div>
-
-                <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div class="card p-4">
-                        <div class="text-sm font-bold">Подготовка</div>
-                        <div class="text-xs text-slate-500 mt-1">очистка/пескоструй</div>
-                    </div>
-                    <div class="card p-4">
-                        <div class="text-sm font-bold">Порошок</div>
-                        <div class="text-xs text-slate-500 mt-1">стойкое покрытие</div>
-                    </div>
-                    <div class="card p-4">
-                        <div class="text-sm font-bold">Аккуратно</div>
-                        <div class="text-xs text-slate-500 mt-1">ровный цвет</div>
-                    </div>
-                </div>
+                <p class="eyebrow"><span></span> Услуги мастерской</p>
+                <h2>Не маскируем дефекты — восстанавливаем поверхность</h2>
             </div>
-
-            <div id="config" class="card p-6">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="text-sm font-extrabold">Подбор цвета покрытия</div>
-                    <div class="text-xs text-slate-500">размер влияет на цену, покрытие — на визуализацию</div>
-                </div>
-
-                <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {{-- Блок с размерами/цветами/ценой --}}
-                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 order-2 sm:order-1">
-                        <div class="text-xs font-bold text-slate-600">Размер диска</div>
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            @foreach($sizes as $i => $s)
-                                <button type="button"
-                                        class="chip {{ $i===0 ? 'chip-active' : '' }}"
-                                        data-size-index="{{ $i }}"
-                                        aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
-                                    {{ $s['label'] }}
-                                </button>
-                            @endforeach
-                        </div>
-
-                        <p class="mt-2 text-xs leading-relaxed text-slate-500">Размер используется для расчёта. На иллюстрации не меняется модель или геометрия диска.</p>
-
-                        <div class="mt-4 text-xs font-bold text-slate-600">Покрытие</div>
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            @foreach($finishes as $i => $f)
-                                <button type="button"
-                                        class="chip {{ $i===0 ? 'chip-active' : '' }}"
-                                        data-finish-index="{{ $i }}"
-                                        aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
-                                    {{ $f['name'] }}
-                                </button>
-                            @endforeach
-                        </div>
-
-                        <div class="mt-5 rounded-2xl bg-white border border-slate-200 p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-xs text-slate-500">Ориентировочно за комплект (4 шт.)</div>
-                                <div id="priceLabel" class="text-lg font-extrabold">—</div>
-                            </div>
-                            <div class="mt-2 text-xs text-slate-500">
-                                Итог зависит от состояния дисков, типа краски, необходимости ремонта и лака.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-2xl bg-white border border-slate-200 p-4 order-1 sm:order-2">
-                        <div class="text-xs font-bold text-slate-600">Визуализация цвета</div>
-
-                        <div class="mt-3 relative aspect-square w-full grid place-items-center overflow-hidden rounded-2xl bg-slate-50 border border-slate-200">
-                            <img id="wheelImg"
-                                 src="{{ asset('images/R15/g.png') }}"
-                                 alt="Диск"
-                                 class="w-[88%] h-[88%] object-contain"
-                                 style="mix-blend-mode:multiply; filter:brightness(1) contrast(1.08);">
-                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs">
-                                <span id="sizeTag" class="chip bg-white/80 backdrop-blur">{{ $sizes[0]['label'] }}</span>
-                                <span id="finishTag" class="chip bg-white/80 backdrop-blur">{{ $finishes[0]['name'] }}</span>
-                            </div>
-                        </div>
-                        <p class="mt-3 text-xs leading-relaxed text-slate-500">Условный диск показывает оттенок покрытия. Точный вид зависит от модели, фактуры и освещения.</p>
-
-                        <div class="mt-4 flex gap-3">
-                            <a href="#contact" class="btn-primary w-full text-center">Записаться</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p>Покрытие держится только на правильно подготовленном металле. Поэтому результат начинается не с цвета, а с очистки и проверки диска.</p>
         </div>
-    </div>
-</section>
 
-<section id="services" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-    <div class="flex items-end justify-between gap-6 flex-wrap">
-        <div>
-            <h2 class="text-2xl sm:text-3xl font-extrabold">Услуги</h2>
-            <p class="mt-2 text-slate-600 max-w-2xl">
-                Полимерная покраска — это порошковое покрытие с высокой стойкостью. Подходит для ежедневной эксплуатации и наших дорог.
-            </p>
-        </div>
-        <a href="#contact" class="btn-ghost">Задать вопрос</a>
-    </div>
-
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card p-6">
-            <div class="text-lg font-extrabold">Покраска дисков</div>
-            <p class="mt-2 text-sm text-slate-600">Полная подготовка + грунт + финишный слой порошка.</p>
-        </div>
-        <div class="card p-6">
-            <div class="text-lg font-extrabold">Подбор цвета</div>
-            <p class="mt-2 text-sm text-slate-600">Популярные стандартные оттенки + индивидуальные (по согласованию).</p>
-        </div>
-        <div class="card p-6">
-            <div class="text-lg font-extrabold">Консультация</div>
-            <p class="mt-2 text-sm text-slate-600">Подскажем по срокам и подготовке. Сориентируем по цене по фото.</p>
-        </div>
-    </div>
-</section>
-
-<section id="works" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="flex items-end justify-between gap-6 flex-wrap">
-        <div>
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Варианты покрытия</h2>
-            <p class="mt-2 text-slate-600 max-w-2xl">Посмотрите оттенки на условном диске. Галерею реальных работ «до/после» добавим, когда будут фотографии из мастерской.</p>
-        </div>
-        <div class="flex items-center gap-2" aria-label="Прокрутка вариантов покрытия">
-            <button type="button" class="btn-ghost !px-3 !py-2" data-slider-direction="-1" aria-label="Предыдущий вариант">←</button>
-            <button type="button" class="btn-ghost !px-3 !py-2" data-slider-direction="1" aria-label="Следующий вариант">→</button>
-        </div>
-    </div>
-
-    <div id="coatingSlider" class="coating-slider mt-8 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4" aria-label="Варианты покрытия">
-        @foreach($finishes as $i => $finish)
-            <article class="coating-slide card w-[82vw] max-w-[360px] shrink-0 snap-start p-5 sm:w-[340px]">
-                <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 grid place-items-center">
-                    <img src="{{ asset('images/R15/' . $finish['file']) }}"
-                         alt="{{ $finish['name'] }} — визуализация покрытия"
-                         class="h-[88%] w-[88%] object-contain"
-                         loading="lazy"
-                         style="mix-blend-mode:multiply; filter:brightness(1) contrast(1.08);">
-                </div>
-                <p class="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Покрытие</p>
-                <h3 class="mt-1 text-lg font-extrabold text-slate-900">{{ $finish['name'] }}</h3>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">Визуализация оттенка на условном диске.</p>
-                <button type="button" class="btn-ghost mt-4 w-full text-sm" data-coating-index="{{ $i }}">Выбрать в подборе</button>
+        <div class="service-grid">
+            <article class="service-card service-card-dark">
+                <span class="service-number">01</span>
+                <h3>Порошковая покраска</h3>
+                <p>Стойкое покрытие для ежедневной эксплуатации: город, трасса, реагенты и перепады температуры.</p>
+                <ul><li>Очистка поверхности</li><li>Грунтование</li><li>Финишный слой</li></ul>
             </article>
-        @endforeach
-    </div>
-    <p class="mt-2 text-sm text-slate-500 sm:hidden">Листайте варианты в сторону.</p>
-</section>
-
-<!-- Lightbox -->
-<div id="lightbox" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[9999] p-4">
-    <img id="lightboxImg" class="max-w-[95vw] max-h-[90vh] rounded-2xl shadow-2xl" alt="">
-</div>
-
-<section id="reviews" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-    <h2 class="text-2xl sm:text-3xl font-extrabold">Отзывы</h2>
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card p-6">
-            <div class="text-sm font-extrabold">«Как новые!»</div>
-            <p class="mt-2 text-sm text-slate-600">Ровный цвет, без потеков. Сделали быстро.</p>
-        </div>
-        <div class="card p-6">
-            <div class="text-sm font-extrabold">«Понравился подбор»</div>
-            <p class="mt-2 text-sm text-slate-600">Антрацит вживую выглядит супер. Спасибо!</p>
-        </div>
-        <div class="card p-6">
-            <div class="text-sm font-extrabold">«Отличный сервис»</div>
-            <p class="mt-2 text-sm text-slate-600">Все объяснили, сроки соблюли.</p>
+            <article class="service-card">
+                <span class="service-number">02</span>
+                <h3>Восстановление вида</h3>
+                <p>Убираем следы старой краски, окисление и визуальные дефекты перед нанесением покрытия.</p>
+                <ul><li>Осмотр дисков</li><li>Подготовка к окраске</li><li>Контроль геометрии</li></ul>
+            </article>
+            <article class="service-card">
+                <span class="service-number">03</span>
+                <h3>Подбор финиша</h3>
+                <p>Серебро OEM, графит, чёрный, антрацит и бронза — в глянцевом, сатиновом или матовом исполнении.</p>
+                <ul><li>Базовые оттенки</li><li>Подбор по образцу</li><li>Согласование до работ</li></ul>
+            </article>
         </div>
     </div>
 </section>
 
-<section id="contact" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div class="card p-6">
-            <h2 class="text-2xl font-extrabold">Оставить заявку</h2>
-<p class="mt-2 text-sm text-slate-600">
-    Напишите номер и комментарий — перезвоним. Письмо уйдёт на почту.
-</p>
+<section id="process" class="section process-section">
+    <div class="container-wide">
+        <div class="section-heading section-heading-light">
+            <div>
+                <p class="eyebrow eyebrow-light"><span></span> Как мы работаем</p>
+                <h2>Четыре этапа до готового комплекта</h2>
+            </div>
+            <p>До начала окраски фиксируем состояние дисков и согласовываем итоговую стоимость.</p>
+        </div>
 
-@if (session('ok'))
-    <div class="mt-4 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-900">
-        {{ session('ok') }}
+        <ol class="process-grid">
+            <li><span>01</span><h3>Оценка</h3><p>Размер, состояние, повреждения и желаемый цвет.</p></li>
+            <li><span>02</span><h3>Подготовка</h3><p>Очистка от старого покрытия, коррозии и загрязнений.</p></li>
+            <li><span>03</span><h3>Покрытие</h3><p>Грунт, порошковый слой и полимеризация в камере.</p></li>
+            <li><span>04</span><h3>Контроль</h3><p>Проверяем равномерность цвета, кромки и финиш.</p></li>
+        </ol>
     </div>
-@endif
+</section>
 
-@if ($errors->any())
-    <div class="mt-4 rounded-2xl bg-red-50 border border-red-200 p-4 text-sm text-red-900">
-        <div class="font-bold mb-2">Проверьте поля:</div>
-        <ul class="list-disc list-inside">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
+<section id="config" class="section configurator-section">
+    <div class="container-wide">
+        <div class="config-shell">
+            <div class="config-copy">
+                <p class="eyebrow"><span></span> Визуальный подбор</p>
+                <h2>Подберите размер и покрытие</h2>
+                <p>Теперь для R15, R17 и R19 используются разные модели дисков. Цветовая визуализация показывает характер оттенка, но итог зависит от освещения и фактуры металла.</p>
+
+                <fieldset class="selector-group">
+                    <legend>1. Размер и модель</legend>
+                    <div class="size-selector">
+                        @foreach($sizes as $i => $size)
+                            <button type="button"
+                                    class="selector-button {{ $i === 0 ? 'is-active' : '' }}"
+                                    data-size-index="{{ $i }}"
+                                    aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
+                                <strong>{{ $size['label'] }}</strong>
+                                <span>{{ $size['name'] }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                </fieldset>
+
+                <fieldset class="selector-group">
+                    <legend>2. Покрытие</legend>
+                    <div class="finish-selector">
+                        @foreach($finishes as $i => $finish)
+                            <button type="button"
+                                    class="finish-button {{ $i === 0 ? 'is-active' : '' }}"
+                                    data-finish-index="{{ $i }}"
+                                    aria-pressed="{{ $i === 0 ? 'true' : 'false' }}">
+                                <span class="finish-swatch" style="--swatch: {{ $finish['swatch'] }}"></span>
+                                <span>{{ $finish['name'] }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                </fieldset>
+
+                <div class="config-price">
+                    <div><span>Ориентир за комплект</span><strong id="priceLabel">14 400 ₽</strong></div>
+                    <p>Точная цена зависит от состояния, ширины диска, сложности цвета и дополнительных работ.</p>
+                </div>
+            </div>
+
+            <div class="wheel-stage">
+                <div class="wheel-stage-top">
+                    <span>Визуализация цвета</span>
+                    <span id="modelTag">R15 · Classic 5</span>
+                </div>
+                <div class="wheel-backdrop" aria-live="polite">
+                    <div class="wheel-halo"></div>
+                    <img id="wheelImg"
+                         src="{{ asset($sizes[0]['image']) }}"
+                         alt="Диск R15 в покрытии Серебро OEM"
+                         class="wheel-visual tone-{{ $finishes[0]['tone'] }}"
+                         width="960"
+                         height="960">
+                </div>
+                <div class="wheel-stage-bottom">
+                    <div><span>Размер</span><strong id="sizeTag">{{ $sizes[0]['label'] }}</strong></div>
+                    <div><span>Покрытие</span><strong id="finishTag">{{ $finishes[0]['name'] }}</strong></div>
+                </div>
+                <a href="#contact" class="button button-dark button-full">Получить точный расчёт</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="works" class="section coatings-section">
+    <div class="container-wide">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow"><span></span> Варианты покрытия</p>
+                <h2>Шесть спокойных автомобильных оттенков</h2>
+            </div>
+            <div class="slider-controls" aria-label="Прокрутка вариантов">
+                <button type="button" data-slider-direction="-1" aria-label="Предыдущий вариант">←</button>
+                <button type="button" data-slider-direction="1" aria-label="Следующий вариант">→</button>
+            </div>
+        </div>
+
+        <div id="coatingSlider" class="coating-slider" aria-label="Галерея вариантов покрытия">
+            @foreach($finishes as $i => $finish)
+                @php($gallerySize = $sizes[$i % count($sizes)])
+                <article class="coating-card">
+                    <div class="coating-visual">
+                        <span>{{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                        <img src="{{ asset($gallerySize['image']) }}"
+                             alt="{{ $finish['name'] }} на модели {{ $gallerySize['label'] }}"
+                             class="tone-{{ $finish['tone'] }}"
+                             width="960"
+                             height="960"
+                             loading="lazy">
+                    </div>
+                    <div class="coating-info">
+                        <div><p>{{ $gallerySize['label'] }} · {{ $gallerySize['name'] }}</p><h3>{{ $finish['name'] }}</h3></div>
+                        <button type="button" data-coating-index="{{ $i }}" data-gallery-size-index="{{ $i % count($sizes) }}">Выбрать</button>
+                    </div>
+                </article>
             @endforeach
-        </ul>
+        </div>
+        <p class="swipe-hint">Проведите пальцем в сторону, чтобы посмотреть все варианты.</p>
     </div>
-@endif
+</section>
 
-{{-- Блок для AJAX-статуса --}}
-<div id="leadFormStatus" class="mt-4 hidden text-sm rounded-2xl px-4 py-3"></div>
+<section class="section pricing-section">
+    <div class="container-wide pricing-shell">
+        <div>
+            <p class="eyebrow eyebrow-light"><span></span> Стоимость</p>
+            <h2>Цена зависит от работы, а не только от диаметра</h2>
+        </div>
+        <div class="pricing-list">
+            <div><span>R15 · комплект</span><strong>от 14 400 ₽</strong></div>
+            <div><span>R17 · комплект</span><strong>от 16 400 ₽</strong></div>
+            <div><span>R19 · комплект</span><strong>от 18 400 ₽</strong></div>
+            <p>На расчёт влияют слой старого покрытия, коррозия, сложность изделия, размер и выбранный финиш.</p>
+        </div>
+    </div>
+</section>
 
-<form id="leadForm"
-      class="mt-6 grid grid-cols-1 gap-4"
-      method="POST"
-      action="{{ route('lead.send') }}">
-    @csrf
-    <div>
-        <label class="text-xs font-bold text-slate-600">Имя</label>
-        <input name="name"
-               value="{{ old('name') }}"
-               class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-200"
-               placeholder="Как к вам обращаться">
-        <p class="mt-1 text-[11px] text-slate-400">
-            Разрешены буквы (рус/англ), пробелы, запятые, точки. До 30 символов.
-        </p>
+<section class="section faq-section">
+    <div class="container-wide faq-grid">
+        <div>
+            <p class="eyebrow"><span></span> Частые вопросы</p>
+            <h2>Перед тем как привезти диски</h2>
+        </div>
+        <div class="faq-list">
+            <details open><summary>Можно оценить работу по фотографии?</summary><p>Да. Пришлите общий вид комплекта и крупно самые повреждённые места. Предварительно назовём диапазон цены, окончательно — после осмотра.</p></details>
+            <details><summary>Цвет на экране совпадёт с реальным?</summary><p>Визуализатор показывает направление оттенка. На восприятие влияют экран, освещение, фактура и степень блеска, поэтому цвет согласуем отдельно.</p></details>
+            <details><summary>Что входит в ориентировочную цену?</summary><p>Базовая подготовка и порошковая окраска комплекта. Ремонт повреждений и сложные многослойные покрытия оцениваются отдельно.</p></details>
+        </div>
     </div>
-    <div>
-        <label class="text-xs font-bold text-slate-600">Телефон *</label>
-        <input name="phone"
-               value="{{ old('phone') }}"
-               required
-               class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-200"
-               placeholder="+7 (___) ___-__-__">
-        <p class="mt-1 text-[11px] text-slate-400">
-            Разрешены цифры, пробелы, +, -, (, ). До 20 символов.
-        </p>
-    </div>
-    <div>
-        <label class="text-xs font-bold text-slate-600">Комментарий</label>
-        <textarea name="message"
-                  rows="4"
-                  class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-200"
-                  placeholder="Размер, цвет, состояние дисков...">{{ old('message') }}</textarea>
-        <p class="mt-1 text-[11px] text-slate-400">
-            До 1000 символов.
-        </p>
-    </div>
+</section>
 
-    <button class="btn-primary w-full" type="submit">
-        <span class="inline-flex items-center justify-center gap-2">
-            <span id="leadFormBtnText">Отправить</span>
-            <span id="leadFormSpinner"
-                  class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-        </span>
-    </button>
+<section id="contact" class="section contact-section">
+    <div class="container-wide contact-grid">
+        <div class="contact-form-card">
+            <p class="eyebrow"><span></span> Заявка на расчёт</p>
+            <h2>Опишите комплект — мы перезвоним</h2>
+            <p class="contact-intro">Укажите размер дисков, желаемый цвет и заметные повреждения.</p>
 
-    <div class="text-xs text-slate-500">
-        Отправляя форму, вы соглашаетесь на обработку контактных данных для обратной связи.
-    </div>
-</form>
+            @if (session('ok'))
+                <div class="form-message form-message-success">{{ session('ok') }}</div>
+            @endif
+
+            @if ($errors->any())
+                <div class="form-message form-message-error">
+                    <strong>Проверьте поля:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div id="leadFormStatus" class="form-message" hidden></div>
+
+            <form id="leadForm" class="lead-form" method="POST" action="{{ route('lead.send') }}">
+                @csrf
+                <label>
+                    <span>Имя</span>
+                    <input name="name" value="{{ old('name') }}" autocomplete="name" placeholder="Как к вам обращаться">
+                </label>
+                <label>
+                    <span>Телефон *</span>
+                    <input name="phone" value="{{ old('phone') }}" required inputmode="tel" autocomplete="tel" placeholder="+7 913 000-00-00">
+                </label>
+                <label>
+                    <span>Размер, цвет, состояние</span>
+                    <textarea name="message" rows="4" placeholder="Например: R17, графит, есть сколы и коррозия">{{ old('message') }}</textarea>
+                </label>
+                <button class="button button-accent button-full" type="submit">
+                    <span id="leadFormBtnText">Отправить заявку</span>
+                    <span id="leadFormSpinner" class="form-spinner" hidden></span>
+                </button>
+                <small>Нажимая кнопку, вы соглашаетесь на обработку контактных данных для обратной связи.</small>
+            </form>
         </div>
 
-        <div class="card p-6">
-            <h3 class="text-xl font-extrabold">Как нас найти</h3>
-            <div class="mt-3 text-sm text-slate-600">
-                НСО, г. Бердск, пер. Промышленный 2а/4
+        <div class="location-card">
+            <div class="location-copy">
+                <p class="eyebrow eyebrow-light"><span></span> Мастерская</p>
+                <h2>Бердск, пер. Промышленный, 2а/4</h2>
+                <p>Режим работы уточняйте по телефону перед поездкой.</p>
+                <div class="location-actions">
+                    <a href="tel:+79138954525" class="button button-accent">Позвонить</a>
+                    <a href="https://yandex.ru/maps/?text=%D0%9D%D0%A1%D0%9E%2C%20%D0%91%D0%B5%D1%80%D0%B4%D1%81%D0%BA%2C%20%D0%BF%D0%B5%D1%80.%20%D0%9F%D1%80%D0%BE%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%202%D0%B0%2F4" class="button button-outline-light" target="_blank" rel="noopener">Как проехать</a>
+                </div>
             </div>
-
-            <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200">
-                <iframe
-                    src="https://yandex.ru/map-widget/v1/?ll=83.096077%2C54.766532&mode=whatshere&whatshere%5Bpoint%5D=83.096077%2C54.766532&whatshere%5Bzoom%5D=16&z=16"
-                    width="100%" height="360" frameborder="0" allowfullscreen="true">
-                </iframe>
-            </div>
-
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <a href="tel:+79138954525" class="btn-primary text-center">Позвонить</a>
-                <a href="#contact" class="btn-ghost text-center">Написать</a>
-            </div>
+            <iframe
+                title="НСК Макстар на карте"
+                src="https://yandex.ru/map-widget/v1/?ll=83.096077%2C54.766532&mode=whatshere&whatshere%5Bpoint%5D=83.096077%2C54.766532&whatshere%5Bzoom%5D=16&z=16"
+                loading="lazy"
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
 </section>
 
 <script>
-    // Данные из PHP (контроллер/вью)
     const SIZES = @json($sizes);
     const FINISHES = @json($finishes);
+    const ASSET_BASE = @json(rtrim(asset(''), '/'));
+    const TONE_CLASSES = FINISHES.map(finish => `tone-${finish.tone}`);
 
     let activeSize = 0;
     let activeFinish = 0;
@@ -304,204 +302,123 @@
     const wheelImg = document.getElementById('wheelImg');
     const sizeTag = document.getElementById('sizeTag');
     const finishTag = document.getElementById('finishTag');
+    const modelTag = document.getElementById('modelTag');
     const priceLabel = document.getElementById('priceLabel');
-
-    // Lightbox для увеличения иллюстрации покрытия.
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightboxImg');
 
     function joinUrl(base, path) {
         try {
-            return new URL(path, base.endsWith('/') ? base : (base + '/')).toString();
-        } catch (e) {
-            // fallback
-            if (!base) return path;
-            if (base.endsWith('/') && path.startsWith('/')) return base + path.slice(1);
-            if (!base.endsWith('/') && !path.startsWith('/')) return base + '/' + path;
-            return base + path;
+            return new URL(path, base.endsWith('/') ? base : `${base}/`).toString();
+        } catch (error) {
+            return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
         }
+    }
+
+    function setSelectedButtons(selector, selectedButton) {
+        document.querySelectorAll(selector).forEach(button => {
+            const isSelected = button === selectedButton;
+            button.classList.toggle('is-active', isSelected);
+            button.setAttribute('aria-pressed', String(isSelected));
+        });
     }
 
     function renderPreview() {
-        const s = SIZES[activeSize];
-        const f = FINISHES[activeFinish];
-        const filename = f.file || 'g.png';
-        const src = joinUrl("{{ rtrim(asset('images/R15'), '/') }}", filename);
+        const size = SIZES[activeSize];
+        const finish = FINISHES[activeFinish];
 
-        if (wheelImg && wheelImg.dataset.finish !== filename) {
-            wheelImg.src = src;
-            wheelImg.dataset.finish = filename;
-        }
+        wheelImg.src = joinUrl(ASSET_BASE, size.image);
+        wheelImg.classList.remove(...TONE_CLASSES);
+        wheelImg.classList.add(`tone-${finish.tone}`);
+        wheelImg.alt = `Диск ${size.label} в покрытии ${finish.name}`;
 
-        sizeTag.textContent = s.label || 'R15';
-        finishTag.textContent = f.name || 'Оригинал';
-
-        if (priceLabel && s.price) {
-            priceLabel.textContent = new Intl.NumberFormat('ru-RU').format(s.price) + ' ₽';
-        }
+        sizeTag.textContent = size.label;
+        finishTag.textContent = finish.name;
+        modelTag.textContent = `${size.label} · ${size.name}`;
+        priceLabel.textContent = `${new Intl.NumberFormat('ru-RU').format(size.price)} ₽`;
     }
 
-    // Кнопки размеров
-    document.querySelectorAll('[data-size-index]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-size-index]').forEach(b => {
-                b.classList.remove('chip-active');
-                b.setAttribute('aria-pressed', 'false');
-            });
-            btn.classList.add('chip-active');
-            btn.setAttribute('aria-pressed', 'true');
-            activeSize = Number(btn.dataset.sizeIndex);
+    document.querySelectorAll('[data-size-index]').forEach(button => {
+        button.addEventListener('click', () => {
+            activeSize = Number(button.dataset.sizeIndex);
+            setSelectedButtons('[data-size-index]', button);
             renderPreview();
         });
     });
 
-    // Кнопки покрытий
-    document.querySelectorAll('[data-finish-index]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-finish-index]').forEach(b => {
-                b.classList.remove('chip-active');
-                b.setAttribute('aria-pressed', 'false');
-            });
-            btn.classList.add('chip-active');
-            btn.setAttribute('aria-pressed', 'true');
-            activeFinish = Number(btn.dataset.finishIndex);
+    document.querySelectorAll('[data-finish-index]').forEach(button => {
+        button.addEventListener('click', () => {
+            activeFinish = Number(button.dataset.finishIndex);
+            setSelectedButtons('[data-finish-index]', button);
             renderPreview();
         });
     });
-
-    // Увеличение превью диска
-    if (wheelImg) {
-        wheelImg.addEventListener('click', () => {
-            if (!lb || !lbImg) return;
-            lbImg.src = wheelImg.src;
-            lb.classList.remove('hidden');
-            lb.classList.add('flex');
-        });
-    }
-
-    // Lightbox close
-    if (lb) {
-        lb.addEventListener('click', (e) => {
-            if (e.target === lb || e.target === lbImg) {
-                lb.classList.add('hidden');
-                lb.classList.remove('flex');
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                lb.classList.add('hidden');
-                lb.classList.remove('flex');
-            }
-        });
-    }
 
     const coatingSlider = document.getElementById('coatingSlider');
-    document.querySelectorAll('[data-slider-direction]').forEach(btn => {
-        btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-slider-direction]').forEach(button => {
+        button.addEventListener('click', () => {
             if (!coatingSlider) return;
             coatingSlider.scrollBy({
-                left: Number(btn.dataset.sliderDirection) * coatingSlider.clientWidth * 0.82,
+                left: Number(button.dataset.sliderDirection) * Math.min(coatingSlider.clientWidth * 0.86, 760),
                 behavior: 'smooth',
             });
         });
     });
 
-    document.querySelectorAll('[data-coating-index]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const index = Number(btn.dataset.coatingIndex);
-            const finishButton = document.querySelector(`[data-finish-index="${index}"]`);
+    document.querySelectorAll('[data-coating-index]').forEach(button => {
+        button.addEventListener('click', () => {
+            const finishButton = document.querySelector(`[data-finish-index="${button.dataset.coatingIndex}"]`);
+            const sizeButton = document.querySelector(`[data-size-index="${button.dataset.gallerySizeIndex}"]`);
+            if (sizeButton) sizeButton.click();
             if (finishButton) finishButton.click();
-            document.getElementById('config')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('config').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 
-    // Первый рендер
-    renderPreview();
-
-
-   // === AJAX-отправка формы заявки ===
     const leadForm = document.getElementById('leadForm');
     const leadStatus = document.getElementById('leadFormStatus');
     const leadBtnText = document.getElementById('leadFormBtnText');
     const leadSpinner = document.getElementById('leadFormSpinner');
 
     if (leadForm && leadStatus && leadBtnText && leadSpinner) {
-        leadForm.addEventListener('submit', async (event) => {
+        leadForm.addEventListener('submit', async event => {
             event.preventDefault();
+            const submitButton = leadForm.querySelector('button[type="submit"]');
 
-            // Сбрасываем статус
-            leadStatus.classList.add('hidden');
-            leadStatus.classList.remove(
-                'bg-emerald-50', 'border-emerald-200', 'text-emerald-900',
-                'bg-red-50', 'border-red-200', 'text-red-900', 'border'
-            );
-            leadStatus.textContent = '';
-
-            // Блокируем кнопку и показываем спиннер
-            const submitBtn = leadForm.querySelector('button[type="submit"]');
-            if (submitBtn) submitBtn.disabled = true;
-            leadBtnText.textContent = 'Отправляем...';
-            leadSpinner.classList.remove('hidden');
-
-            const url = leadForm.getAttribute('action');
-            const formData = new FormData(leadForm);
+            leadStatus.hidden = true;
+            leadStatus.className = 'form-message';
+            if (submitButton) submitButton.disabled = true;
+            leadBtnText.textContent = 'Отправляем…';
+            leadSpinner.hidden = false;
 
             try {
-                const response = await fetch(url, {
+                const response = await fetch(leadForm.action, {
                     method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    },
-                    body: formData,
+                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
+                    body: new FormData(leadForm),
                 });
-
-                const contentType = response.headers.get('content-type') || '';
-                const isJson = contentType.includes('application/json');
-                let data = {};
-
-                if (isJson) {
-                    data = await response.json();
-                }
+                const isJson = (response.headers.get('content-type') || '').includes('application/json');
+                const data = isJson ? await response.json() : {};
 
                 if (!response.ok) {
-                    // Ошибки валидации 422
-                    if (response.status === 422 && isJson && data.errors) {
-                        const messages = Object.values(data.errors).flat();
-                        leadStatus.textContent = messages.join(' ');
-                    } else {
-                        leadStatus.textContent = data.message || 'Ошибка при отправке. Попробуйте ещё раз.';
-                    }
-
-                    leadStatus.classList.remove('hidden');
-                    leadStatus.classList.add(
-                        'border', 'bg-red-50', 'border-red-200', 'text-red-900'
-                    );
-                } else {
-                    // Успешно
-                    leadStatus.textContent = data.message || 'Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
-                    leadStatus.classList.remove('hidden');
-                    leadStatus.classList.add(
-                        'border', 'bg-emerald-50', 'border-emerald-200', 'text-emerald-900'
-                    );
-                    leadForm.reset();
+                    const errors = data.errors ? Object.values(data.errors).flat().join(' ') : null;
+                    throw new Error(errors || data.message || 'Не удалось отправить заявку. Позвоните нам или попробуйте ещё раз.');
                 }
+
+                leadStatus.textContent = data.message || 'Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
+                leadStatus.classList.add('form-message-success');
+                leadStatus.hidden = false;
+                leadForm.reset();
             } catch (error) {
-                console.error(error);
-                leadStatus.textContent = 'Ошибка соединения с сервером. Попробуйте ещё раз.';
-                leadStatus.classList.remove('hidden');
-                leadStatus.classList.add(
-                    'border', 'bg-red-50', 'border-red-200', 'text-red-900'
-                );
+                leadStatus.textContent = error.message || 'Ошибка соединения. Попробуйте ещё раз.';
+                leadStatus.classList.add('form-message-error');
+                leadStatus.hidden = false;
             } finally {
-                // Возвращаем кнопку в нормальное состояние
-                if (submitBtn) submitBtn.disabled = false;
-                leadBtnText.textContent = 'Отправить';
-                leadSpinner.classList.add('hidden');
+                if (submitButton) submitButton.disabled = false;
+                leadBtnText.textContent = 'Отправить заявку';
+                leadSpinner.hidden = true;
             }
         });
     }
 
-
+    renderPreview();
 </script>
 @endsection

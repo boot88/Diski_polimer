@@ -16,8 +16,9 @@ class ExampleTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Варианты покрытия')
-            ->assertSee('Размер используется для расчёта');
+            ->assertSee('НСК Макстар')
+            ->assertSee('Подберите размер и покрытие')
+            ->assertSee('Шесть спокойных автомобильных оттенков');
     }
 
     public function test_valid_lead_is_sent_with_configured_recipient(): void

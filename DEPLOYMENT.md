@@ -1,4 +1,4 @@
-# Публикация PolymerDisk на обычном PHP-хостинге
+# Публикация сайта НСК Макстар на обычном PHP-хостинге
 
 ## Что хранится в Git и что остаётся на сервере
 
@@ -105,7 +105,7 @@ MAIL_SCHEME=smtp
 MAIL_USERNAME=...
 MAIL_PASSWORD=...
 MAIL_FROM_ADDRESS=...
-MAIL_FROM_NAME="PolymerDisk"
+MAIL_FROM_NAME="НСК Макстар"
 LEAD_TO_EMAIL=...
 ```
 
