@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Mail;
 
 class LeadController extends Controller
 {
+    private const SITE_NAME = 'НСК-Макстар-Диски';
+    private const SITE_URL = 'https://happypils.ru/Diski_polimer/public/';
+
     public function send(Request $request)
     {
         $data = $request->validate([
@@ -148,17 +151,49 @@ class LeadController extends Controller
             }
 
             $messageUrl = 'https://platform-api2.max.ru/messages?'.http_build_query([$recipientKey => $recipientId]);
-            $response = $this->maxClient($accessToken)->post($messageUrl, [
-                'text' => $this->formatNotification($lead, $photo !== null && $imageToken === null),
-                'format' => 'html',
-                'disable_link_preview' => true,
-                'attachments' => $attachments,
-            ]);
+            $response = null;
+            $retryDelays = $attachments !== [] ? [700000, 1000000, 2000000, 4000000] : [0];
 
-            if (! $response->successful() && $attachments !== []) {
-                Log::warning('MAX image was not ready, retrying lead without attachment', [
+            foreach ($retryDelays as $attempt => $delay) {
+                if ($delay > 0) {
+                    usleep($delay);
+                }
+
+                $response = $this->maxClient($accessToken)->post($messageUrl, [
+                    'text' => $this->formatNotification($lead, false),
+                    'format' => 'html',
+                    'disable_link_preview' => true,
+                    'attachments' => $attachments,
+                ]);
+
+                if ($response->successful()) {
+                    break;
+                }
+
+                $error = strtolower((string) ($response->json('code')
+                    ?? $response->json('message')
+                    ?? $response->json('description')
+                    ?? ''));
+
+                if ($attachments === []
+                    || (! str_contains($error, 'attachment.not.ready')
+                        && ! str_contains($error, 'not.processed')
+                        && ! str_contains($error, 'not ready'))) {
+                    break;
+                }
+
+                Log::info('MAX image is still processing', [
+                    'attempt' => $attempt + 1,
                     'status' => $response->status(),
                 ]);
+            }
+
+            if (! $response?->successful() && $attachments !== []) {
+                Log::warning('MAX image delivery failed after retries, sending lead text', [
+                    'status' => $response?->status(),
+                    'description' => $response?->json('description') ?? $response?->json('message'),
+                ]);
+
                 $response = $this->maxClient($accessToken)->post($messageUrl, [
                     'text' => $this->formatNotification($lead, true),
                     'format' => 'html',
@@ -167,10 +202,10 @@ class LeadController extends Controller
                 ]);
             }
 
-            if (! $response->successful()) {
+            if (! $response?->successful()) {
                 Log::error('MAX lead delivery failed', [
-                    'status' => $response->status(),
-                    'description' => $response->json('description') ?? $response->json('message'),
+                    'status' => $response?->status(),
+                    'description' => $response?->json('description') ?? $response?->json('message'),
                 ]);
 
                 return false;
@@ -203,15 +238,30 @@ class LeadController extends Controller
                 return null;
             }
 
-            $upload = $this->maxClient($accessToken)
+            $upload = $this->maxUploadClient($accessToken)
                 ->attach('data', $contents, $photo->getClientOriginalName(), [
                     'Content-Type' => $photo->getMimeType() ?: 'application/octet-stream',
                 ])
                 ->post($uploadUrl);
-            $token = $upload->json('token') ?? $slot->json('token');
+
+            $queryToken = null;
+            $query = parse_url($uploadUrl, PHP_URL_QUERY);
+
+            if (is_string($query)) {
+                parse_str($query, $queryParameters);
+                $queryToken = $queryParameters['token'] ?? $queryParameters['attachment_token'] ?? null;
+            }
+
+            $token = $upload->json('token')
+                ?? $upload->json('retval.token')
+                ?? $slot->json('token')
+                ?? $queryToken;
 
             if (! $upload->successful() || ! is_string($token) || $token === '') {
-                Log::warning('MAX image upload failed', ['status' => $upload->status()]);
+                Log::warning('MAX image upload failed', [
+                    'status' => $upload->status(),
+                    'description' => $upload->json('description') ?? $upload->json('message'),
+                ]);
 
                 return null;
             }
@@ -222,6 +272,20 @@ class LeadController extends Controller
 
             return null;
         }
+    }
+
+    private function maxUploadClient(string $accessToken): PendingRequest
+    {
+        $client = Http::acceptJson()
+            ->withHeaders(['Authorization' => $accessToken])
+            ->timeout(30);
+        $caBundle = trim((string) config('services.max.ca_bundle'));
+
+        if ($caBundle !== '') {
+            $client = $client->withOptions(['verify' => $caBundle]);
+        }
+
+        return $client;
     }
 
     private function maxClient(string $accessToken): PendingRequest
@@ -241,8 +305,9 @@ class LeadController extends Controller
 
     private function formatNotification(array $lead, bool $photoByEmailOnly = false): string
     {
+        $time = str_replace(['.', ':'], ['.&#8203;', ':&#8203;'], $this->escapeHtml($lead['created_at']));
         $lines = [
-            '<b>Новая заявка · НСК Макстар · Диски</b>',
+            '<b>Новая заявка · </b><a href="'.self::SITE_URL.'"><b>'.self::SITE_NAME.'</b></a>',
             '<b>Имя:</b> '.($lead['name'] !== '' ? $this->escapeHtml($lead['name']) : '—'),
             '<b>Телефон:</b> '.$this->escapeHtml($lead['phone']),
             '<b>Описание:</b> '.($lead['message'] !== '' ? $this->escapeHtml($lead['message']) : '—'),
@@ -254,7 +319,7 @@ class LeadController extends Controller
                 : '<b>Фото:</b> прикреплено к сообщению';
         }
 
-        $lines[] = '<b>Время:</b> '.$this->escapeHtml($lead['created_at']).' (Новосибирск)';
+        $lines[] = '<b>Время:</b> <code>'.$time.'</code> (Новосибирск)';
 
         return implode("\n", $lines);
     }
