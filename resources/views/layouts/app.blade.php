@@ -135,7 +135,7 @@
 
 <div class="mobile-action-bar" aria-label="Быстрые действия">
     <a href="tel:+79138954525">Позвонить</a>
-    <a href="#photo" class="button button-accent" data-photo-trigger>Оценить по фото</a>
+    <a href="#contact" class="button button-accent">Оценить по фото</a>
 </div>
 
 <script>
@@ -162,16 +162,51 @@
         mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
     }
 
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let scrollAnimationFrame = null;
+
+    const smoothScrollTo = target => {
+        if (scrollAnimationFrame) window.cancelAnimationFrame(scrollAnimationFrame);
+
+        const header = document.querySelector('.site-header');
+        const offset = header ? header.getBoundingClientRect().height : 0;
+        const start = window.scrollY;
+        const destination = Math.max(0, target.getBoundingClientRect().top + start - offset);
+
+        if (reducedMotion || Math.abs(destination - start) < 2) {
+            window.scrollTo(0, destination);
+            return;
+        }
+
+        const distance = destination - start;
+        const duration = Math.min(850, Math.max(550, Math.abs(distance) * 0.35));
+        const startedAt = performance.now();
+
+        const animate = now => {
+            const progress = Math.min((now - startedAt) / duration, 1);
+            const eased = progress < 0.5
+                ? 4 * progress ** 3
+                : 1 - ((-2 * progress + 2) ** 3) / 2;
+
+            window.scrollTo(0, start + distance * eased);
+
+            if (progress < 1) {
+                scrollAnimationFrame = requestAnimationFrame(animate);
+            } else {
+                scrollAnimationFrame = null;
+            }
+        };
+
+        scrollAnimationFrame = requestAnimationFrame(animate);
+    };
+
     document.querySelectorAll('a[href^="#"]:not([data-photo-trigger])').forEach(link => {
         link.addEventListener('click', event => {
             const target = document.querySelector(link.getAttribute('href'));
             if (!target) return;
 
             event.preventDefault();
-            const header = document.querySelector('.site-header');
-            const offset = header ? header.getBoundingClientRect().height : 0;
-            const top = target.getBoundingClientRect().top + window.scrollY - offset;
-            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            smoothScrollTo(target);
             history.replaceState(null, '', link.getAttribute('href'));
         });
     });
