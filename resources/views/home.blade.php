@@ -17,7 +17,7 @@
             <p class="hero-lead">Полная подготовка поверхности, порошковая окраска и контроль финиша. Работаем с комплектами R15–R19 и подбираем оттенок под автомобиль.</p>
 
             <div class="hero-actions">
-                <a href="#contact" class="button button-accent">Рассчитать по фото</a>
+                <a href="#photo" class="button button-accent" data-photo-trigger>Оценить по фото</a>
                 <a href="#config" class="button button-light">Подобрать покрытие</a>
             </div>
 
@@ -229,7 +229,7 @@
         <div class="contact-form-card">
             <p class="eyebrow"><span></span> Заявка на расчёт</p>
             <h2>Опишите комплект — мы перезвоним</h2>
-            <p class="contact-intro">Укажите размер дисков, желаемый цвет и заметные повреждения.</p>
+            <p class="contact-intro">Приложите фото дисков, укажите размер и заметные повреждения — так предварительная оценка будет точнее.</p>
 
             @if (session('ok'))
                 <div class="form-message form-message-success">{{ session('ok') }}</div>
@@ -248,8 +248,9 @@
 
             <div id="leadFormStatus" class="form-message" hidden></div>
 
-            <form id="leadForm" class="lead-form" method="POST" action="{{ route('lead.send') }}">
+            <form id="leadForm" class="lead-form" method="POST" action="{{ route('lead.send') }}" enctype="multipart/form-data">
                 @csrf
+                <input class="honeypot-field" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <label>
                     <span>Имя</span>
                     <input name="name" value="{{ old('name') }}" autocomplete="name" placeholder="Как к вам обращаться">
@@ -262,6 +263,34 @@
                     <span>Размер, цвет, состояние</span>
                     <textarea name="message" rows="4" placeholder="Например: R17, графит, есть сколы и коррозия">{{ old('message') }}</textarea>
                 </label>
+                <div id="photo" class="photo-field">
+                    <input id="photoInput"
+                           class="photo-input"
+                           type="file"
+                           name="photo"
+                           accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/avif"
+                           aria-describedby="photoHelp photoState">
+                    <label for="photoInput" class="photo-picker">
+                        <span class="photo-picker-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M4 7.5h3l1.4-2h7.2l1.4 2h3v11H4zM12 10a3.25 3.25 0 1 0 0 6.5A3.25 3.25 0 0 0 12 10z"/>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Добавить фото дисков</strong>
+                            <small id="photoHelp">JPG, PNG, WebP, HEIC или AVIF · до 25 МБ</small>
+                        </span>
+                        <span class="photo-picker-action">Выбрать</span>
+                    </label>
+                    <div id="photoPreview" class="photo-preview" hidden>
+                        <img id="photoPreviewImage" src="" alt="Предпросмотр выбранного фото">
+                        <div>
+                            <strong id="photoState">Фото выбрано</strong>
+                            <span id="photoFileName"></span>
+                        </div>
+                        <button id="photoRemove" type="button" aria-label="Удалить выбранное фото">×</button>
+                    </div>
+                </div>
                 <button class="button button-accent button-full" type="submit">
                     <span id="leadFormBtnText">Отправить заявку</span>
                     <span id="leadFormSpinner" class="form-spinner" hidden></span>
@@ -279,6 +308,7 @@
                     <a href="tel:+79138954525" class="button button-accent">Позвонить</a>
                     <a href="https://yandex.ru/maps/?text=%D0%9D%D0%A1%D0%9E%2C%20%D0%91%D0%B5%D1%80%D0%B4%D1%81%D0%BA%2C%20%D0%BF%D0%B5%D1%80.%20%D0%9F%D1%80%D0%BE%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%202%D0%B0%2F4" class="button button-outline-light" target="_blank" rel="noopener">Как проехать</a>
                 </div>
+                <a class="location-email" href="mailto:polimer@happypils.ru">polimer@happypils.ru</a>
             </div>
             <iframe
                 title="НСК Макстар на карте"
@@ -377,6 +407,69 @@
     const leadStatus = document.getElementById('leadFormStatus');
     const leadBtnText = document.getElementById('leadFormBtnText');
     const leadSpinner = document.getElementById('leadFormSpinner');
+    const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoPreviewImage = document.getElementById('photoPreviewImage');
+    const photoFileName = document.getElementById('photoFileName');
+    const photoRemove = document.getElementById('photoRemove');
+    let photoObjectUrl = null;
+
+    const clearPhotoPreview = () => {
+        if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
+        photoObjectUrl = null;
+        if (photoInput) photoInput.value = '';
+        if (photoPreviewImage) photoPreviewImage.removeAttribute('src');
+        if (photoFileName) photoFileName.textContent = '';
+        if (photoPreview) photoPreview.hidden = true;
+    };
+
+    if (photoInput && photoPreview && photoPreviewImage && photoFileName) {
+        photoInput.addEventListener('change', () => {
+            const file = photoInput.files?.[0];
+            if (!file) return clearPhotoPreview();
+
+            if (file.size > 25 * 1024 * 1024) {
+                clearPhotoPreview();
+                leadStatus.textContent = 'Размер фотографии не должен превышать 25 МБ.';
+                leadStatus.className = 'form-message form-message-error';
+                leadStatus.hidden = false;
+                return;
+            }
+
+            if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
+            photoObjectUrl = URL.createObjectURL(file);
+            photoPreviewImage.src = photoObjectUrl;
+            photoFileName.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} МБ`;
+            photoPreview.hidden = false;
+            document.getElementById('photo')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    }
+
+    photoRemove?.addEventListener('click', clearPhotoPreview);
+
+    async function prepareMobilePhoto(file) {
+        if (!file || file.size <= 4 * 1024 * 1024) return file;
+        if (!('createImageBitmap' in window)) return file;
+
+        try {
+            const bitmap = await createImageBitmap(file);
+            const maxSide = 2200;
+            const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(bitmap.width * scale);
+            canvas.height = Math.round(bitmap.height * scale);
+            canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+            bitmap.close();
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
+            if (!blob) return file;
+
+            const baseName = file.name.replace(/\.[^.]+$/, '') || 'diski';
+            return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+        } catch (error) {
+            return file;
+        }
+    }
 
     if (leadForm && leadStatus && leadBtnText && leadSpinner) {
         leadForm.addEventListener('submit', async event => {
@@ -390,10 +483,17 @@
             leadSpinner.hidden = false;
 
             try {
+                const formData = new FormData(leadForm);
+                const originalPhoto = photoInput?.files?.[0];
+                if (originalPhoto) {
+                    const preparedPhoto = await prepareMobilePhoto(originalPhoto);
+                    formData.set('photo', preparedPhoto, preparedPhoto.name);
+                }
+
                 const response = await fetch(leadForm.action, {
                     method: 'POST',
                     headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
-                    body: new FormData(leadForm),
+                    body: formData,
                 });
                 const isJson = (response.headers.get('content-type') || '').includes('application/json');
                 const data = isJson ? await response.json() : {};
@@ -407,6 +507,7 @@
                 leadStatus.classList.add('form-message-success');
                 leadStatus.hidden = false;
                 leadForm.reset();
+                clearPhotoPreview();
             } catch (error) {
                 leadStatus.textContent = error.message || 'Ошибка соединения. Попробуйте ещё раз.';
                 leadStatus.classList.add('form-message-error');

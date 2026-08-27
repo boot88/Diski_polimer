@@ -7,7 +7,8 @@
     <meta name="description" content="НСК Макстар — порошковая покраска и восстановление автомобильных дисков в Бердске. Подготовка, покрытие и контроль результата.">
     <title>НСК Макстар — порошковая покраска дисков в Бердске</title>
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="preload" as="image" type="image/webp" href="{{ asset('images/brand/hero-workshop.webp') }}" fetchpriority="high">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,6 +19,7 @@
         'name' => 'НСК Макстар',
         'description' => 'Порошковая покраска и восстановление автомобильных дисков.',
         'telephone' => '+79138954525',
+        'email' => 'polimer@happypils.ru',
         'address' => [
             '@type' => 'PostalAddress',
             'addressLocality' => 'Бердск',
@@ -46,7 +48,9 @@
 <header class="site-header">
     <nav class="container-wide nav-shell" aria-label="Основная навигация">
         <a href="#top" class="brand" aria-label="НСК Макстар — на главную">
-            <span class="brand-mark" aria-hidden="true">М</span>
+            <span class="brand-mark" aria-hidden="true">
+                <img src="{{ asset('images/brand/logo-mark.svg') }}" alt="" width="42" height="42">
+            </span>
             <span class="brand-copy">
                 <strong>НСК Макстар</strong>
                 <small>Покраска дисков · Бердск</small>
@@ -79,6 +83,7 @@
             <a href="#works">Варианты цвета</a>
             <a href="#contact">Контакты</a>
             <a href="tel:+79138954525" class="mobile-menu-phone">+7 913 895-45-25</a>
+            <a href="mailto:polimer@happypils.ru" class="mobile-menu-email">polimer@happypils.ru</a>
         </div>
     </div>
 </header>
@@ -91,7 +96,9 @@
     <div class="container-wide footer-grid">
         <div class="footer-brand">
             <a href="#top" class="brand brand-footer">
-                <span class="brand-mark" aria-hidden="true">М</span>
+                <span class="brand-mark" aria-hidden="true">
+                    <img src="{{ asset('images/brand/logo-mark.svg') }}" alt="" width="42" height="42">
+                </span>
                 <span class="brand-copy">
                     <strong>НСК Макстар</strong>
                     <small>Порошковая покраска дисков</small>
@@ -109,6 +116,7 @@
         <div>
             <h2 class="footer-title">Связаться</h2>
             <a href="tel:+79138954525">+7 913 895-45-25</a>
+            <a href="mailto:polimer@happypils.ru">polimer@happypils.ru</a>
             <a href="https://wa.me/79138954525" target="_blank" rel="noopener">WhatsApp</a>
             <a href="https://vk.ru/club105621991" target="_blank" rel="noopener">ВКонтакте</a>
         </div>
@@ -127,16 +135,18 @@
 
 <div class="mobile-action-bar" aria-label="Быстрые действия">
     <a href="tel:+79138954525">Позвонить</a>
-    <a href="#contact" class="button button-accent">Рассчитать</a>
+    <a href="#photo" class="button button-accent" data-photo-trigger>Оценить по фото</a>
 </div>
 
 <script>
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const mobileMenu = document.getElementById('mobileMenu');
+    const pageBody = document.body;
 
     if (mobileBtn && mobileMenu) {
         const closeMobileMenu = () => {
             mobileMenu.hidden = true;
+            pageBody.classList.remove('menu-open');
             mobileBtn.setAttribute('aria-expanded', 'false');
             mobileBtn.setAttribute('aria-label', 'Открыть меню');
         };
@@ -144,12 +154,36 @@
         mobileBtn.addEventListener('click', () => {
             const willOpen = mobileMenu.hidden;
             mobileMenu.hidden = !willOpen;
+            pageBody.classList.toggle('menu-open', willOpen);
             mobileBtn.setAttribute('aria-expanded', String(willOpen));
             mobileBtn.setAttribute('aria-label', willOpen ? 'Закрыть меню' : 'Открыть меню');
         });
 
         mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
     }
+
+    document.querySelectorAll('a[href^="#"]:not([data-photo-trigger])').forEach(link => {
+        link.addEventListener('click', event => {
+            const target = document.querySelector(link.getAttribute('href'));
+            if (!target) return;
+
+            event.preventDefault();
+            const header = document.querySelector('.site-header');
+            const offset = header ? header.getBoundingClientRect().height : 0;
+            const top = target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            history.replaceState(null, '', link.getAttribute('href'));
+        });
+    });
+
+    document.querySelectorAll('[data-photo-trigger]').forEach(trigger => {
+        trigger.addEventListener('click', event => {
+            const input = document.getElementById('photoInput');
+            if (!input) return;
+            event.preventDefault();
+            input.click();
+        });
+    });
 </script>
 </body>
 </html>

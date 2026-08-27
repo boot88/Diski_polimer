@@ -13,10 +13,18 @@ npm run dev
 php artisan serve
 ```
 
-Для работы формы укажите в `.env` почтовые параметры `MAIL_*` и адрес получателя:
+Для работы формы укажите в `.env` почтовые параметры, получателей и MAX:
 
 ```dotenv
-LEAD_TO_EMAIL=your-mail@example.com
+LEAD_TO_EMAILS=polimer@happypils.ru,povisok888@gmail.com
+MAX_BOT_TOKEN=
+MAX_USER_ID=
+```
+
+Форма принимает фото до 25 МБ и независимо доставляет заявку на оба email и в MAX. Для безопасной проверки без вывода секретов:
+
+```bash
+php artisan lead:test-delivery
 ```
 
 ## Проверки

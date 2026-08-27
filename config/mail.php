@@ -46,6 +46,7 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
+            'auto_tls' => filter_var(env('MAIL_AUTO_TLS', true), FILTER_VALIDATE_BOOLEAN),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
@@ -115,7 +116,11 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
-    // Адрес получателя заявок. Он может отличаться от адреса отправителя.
-    'lead_to_address' => env('LEAD_TO_EMAIL', env('MAIL_FROM_ADDRESS')),
+    // Получателей может быть несколько. Адрес отправителя должен совпадать
+    // с учётной записью SMTP, а адреса заявок задаются отдельно.
+    'lead_to_addresses' => array_values(array_filter(array_map(
+        static fn (string $address): string => trim($address),
+        explode(',', (string) env('LEAD_TO_EMAILS', env('LEAD_TO_EMAIL', env('MAIL_FROM_ADDRESS'))))
+    ))),
 
 ];
