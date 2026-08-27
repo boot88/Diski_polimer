@@ -162,52 +162,51 @@
         mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
     }
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let scrollAnimationFrame = null;
 
     const smoothScrollTo = target => {
         if (scrollAnimationFrame) window.cancelAnimationFrame(scrollAnimationFrame);
 
-        const header = document.querySelector('.site-header');
-        const offset = header ? header.getBoundingClientRect().height : 0;
-        const start = window.scrollY;
-        const destination = Math.max(0, target.getBoundingClientRect().top + start - offset);
-
-        if (reducedMotion || Math.abs(destination - start) < 2) {
-            window.scrollTo(0, destination);
-            return;
-        }
-
-        const distance = destination - start;
+        const scrollPadding = Number.parseFloat(
+            window.getComputedStyle(document.documentElement).scrollPaddingTop
+        ) || 0;
+        const startPosition = window.scrollY;
+        const targetPosition = Math.max(
+            0,
+            target.getBoundingClientRect().top + startPosition - scrollPadding
+        );
+        const distance = targetPosition - startPosition;
         const duration = Math.min(850, Math.max(550, Math.abs(distance) * 0.35));
-        const startedAt = performance.now();
+        const startedAt = window.performance.now();
 
-        const animate = now => {
-            const progress = Math.min((now - startedAt) / duration, 1);
-            const eased = progress < 0.5
+        const animate = currentTime => {
+            const progress = Math.min((currentTime - startedAt) / duration, 1);
+            const easedProgress = progress < 0.5
                 ? 4 * progress ** 3
                 : 1 - ((-2 * progress + 2) ** 3) / 2;
 
-            window.scrollTo(0, start + distance * eased);
+            window.scrollTo(0, startPosition + distance * easedProgress);
 
             if (progress < 1) {
-                scrollAnimationFrame = requestAnimationFrame(animate);
+                scrollAnimationFrame = window.requestAnimationFrame(animate);
             } else {
                 scrollAnimationFrame = null;
+                target.focus({ preventScroll: true });
             }
         };
 
-        scrollAnimationFrame = requestAnimationFrame(animate);
+        scrollAnimationFrame = window.requestAnimationFrame(animate);
     };
 
     document.querySelectorAll('a[href^="#"]:not([data-photo-trigger])').forEach(link => {
         link.addEventListener('click', event => {
-            const target = document.querySelector(link.getAttribute('href'));
+            const hash = link.getAttribute('href');
+            const target = hash && hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
             if (!target) return;
 
             event.preventDefault();
             smoothScrollTo(target);
-            history.replaceState(null, '', link.getAttribute('href'));
+            window.history.replaceState(null, '', hash);
         });
     });
 
