@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 
 class LeadController extends Controller
 {
-    private const SITE_NAME = 'НСК-Макстар-Диски';
+    private const SITE_NAME = 'НСК Макстар - Диски';
     private const SITE_URL = 'https://happypils.ru/Diski_polimer/public/';
 
     public function send(Request $request)
@@ -141,12 +141,12 @@ class LeadController extends Controller
 
         try {
             $attachments = [];
-            $imageToken = $photo?->isValid() ? $this->uploadPhotoToMax($accessToken, $photo) : null;
+            $imagePayload = $photo?->isValid() ? $this->uploadPhotoToMax($accessToken, $photo) : null;
 
-            if ($imageToken !== null) {
+            if ($imagePayload !== null) {
                 $attachments[] = [
                     'type' => 'image',
-                    'payload' => ['token' => $imageToken],
+                    'payload' => $imagePayload,
                 ];
             }
 
@@ -219,7 +219,7 @@ class LeadController extends Controller
         }
     }
 
-    private function uploadPhotoToMax(string $accessToken, UploadedFile $photo): ?string
+    private function uploadPhotoToMax(string $accessToken, UploadedFile $photo): ?array
     {
         try {
             $slot = $this->maxClient($accessToken)
@@ -238,7 +238,7 @@ class LeadController extends Controller
                 return null;
             }
 
-            $upload = $this->maxUploadClient($accessToken)
+            $upload = $this->maxUploadClient()
                 ->attach('data', $contents, $photo->getClientOriginalName(), [
                     'Content-Type' => $photo->getMimeType() ?: 'application/octet-stream',
                 ])
@@ -252,12 +252,13 @@ class LeadController extends Controller
                 $queryToken = $queryParameters['token'] ?? $queryParameters['attachment_token'] ?? null;
             }
 
+            $photos = $upload->json('photos') ?? $upload->json('retval.photos');
             $token = $upload->json('token')
                 ?? $upload->json('retval.token')
                 ?? $slot->json('token')
                 ?? $queryToken;
 
-            if (! $upload->successful() || ! is_string($token) || $token === '') {
+            if (! $upload->successful()) {
                 Log::warning('MAX image upload failed', [
                     'status' => $upload->status(),
                     'description' => $upload->json('description') ?? $upload->json('message'),
@@ -266,7 +267,20 @@ class LeadController extends Controller
                 return null;
             }
 
-            return $token;
+            if (is_array($photos) && $photos !== []) {
+                return ['photos' => $photos];
+            }
+
+            if (is_string($token) && $token !== '') {
+                return ['token' => $token];
+            }
+
+            Log::warning('MAX image upload returned no attachment payload', [
+                'status' => $upload->status(),
+                'response_keys' => array_keys((array) $upload->json()),
+            ]);
+
+            return null;
         } catch (\Throwable $exception) {
             Log::warning('MAX image upload exception', ['message' => $exception->getMessage()]);
 
@@ -274,10 +288,9 @@ class LeadController extends Controller
         }
     }
 
-    private function maxUploadClient(string $accessToken): PendingRequest
+    private function maxUploadClient(): PendingRequest
     {
         $client = Http::acceptJson()
-            ->withHeaders(['Authorization' => $accessToken])
             ->timeout(30);
         $caBundle = trim((string) config('services.max.ca_bundle'));
 
@@ -305,9 +318,8 @@ class LeadController extends Controller
 
     private function formatNotification(array $lead, bool $photoByEmailOnly = false): string
     {
-        $time = str_replace(['.', ':'], ['.&#8203;', ':&#8203;'], $this->escapeHtml($lead['created_at']));
         $lines = [
-            '<b>Новая заявка · </b><a href="'.self::SITE_URL.'"><b>'.self::SITE_NAME.'</b></a>',
+            '<b>Новая заявка · </b><a href="'.self::SITE_URL.'">'.self::SITE_NAME.'</a>',
             '<b>Имя:</b> '.($lead['name'] !== '' ? $this->escapeHtml($lead['name']) : '—'),
             '<b>Телефон:</b> '.$this->escapeHtml($lead['phone']),
             '<b>Описание:</b> '.($lead['message'] !== '' ? $this->escapeHtml($lead['message']) : '—'),
@@ -319,9 +331,40 @@ class LeadController extends Controller
                 : '<b>Фото:</b> прикреплено к сообщению';
         }
 
-        $lines[] = '<b>Время:</b> <code>'.$time.'</code> (Новосибирск)';
+        $lines[] = '<b>Время:</b> '.$this->formatNotificationTime($lead['created_at']).' (Новосибирск)';
 
         return implode("\n", $lines);
+    }
+
+    private function formatNotificationTime(string $value): string
+    {
+        if (! preg_match('/^(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})$/', $value, $parts)) {
+            return 'только что';
+        }
+
+        $months = [
+            1 => 'января',
+            2 => 'февраля',
+            3 => 'марта',
+            4 => 'апреля',
+            5 => 'мая',
+            6 => 'июня',
+            7 => 'июля',
+            8 => 'августа',
+            9 => 'сентября',
+            10 => 'октября',
+            11 => 'ноября',
+            12 => 'декабря',
+        ];
+
+        return sprintf(
+            '%d %s %d года, %d часов %d минут',
+            (int) $parts[1],
+            $months[(int) $parts[2]] ?? '',
+            (int) $parts[3],
+            (int) $parts[4],
+            (int) $parts[5]
+        );
     }
 
     private function photoData(?UploadedFile $photo): ?array
