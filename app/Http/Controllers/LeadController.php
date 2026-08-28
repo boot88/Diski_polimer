@@ -21,13 +21,13 @@ class LeadController extends Controller
             'name' => ['nullable', 'string', 'max:80'],
             'phone' => ['required', 'string', 'max:32', 'regex:/^[\d\s\-+()]+$/'],
             'message' => ['nullable', 'string', 'max:3000'],
-            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,heic,heif,avif', 'max:25600'],
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,heic,heif,avif', 'max:5120'],
             'website' => ['nullable', 'string', 'max:0'],
         ], [
             'phone.required' => 'Укажите номер телефона.',
             'phone.regex' => 'Проверьте формат номера телефона.',
             'photo.mimes' => 'Фото должно быть в формате JPG, PNG, WebP, HEIC или AVIF.',
-            'photo.max' => 'Размер фотографии не должен превышать 25 МБ.',
+            'photo.max' => 'Размер фотографии не должен превышать 5 МБ.',
         ]);
 
         if ($request->filled('website')) {

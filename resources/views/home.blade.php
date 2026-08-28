@@ -17,7 +17,7 @@
             <p class="hero-lead">Полная подготовка поверхности, порошковая окраска и контроль финиша. Работаем с комплектами R15–R19 и подбираем оттенок под автомобиль.</p>
 
             <div class="hero-actions">
-                <a href="#photo" class="button button-accent" data-photo-trigger>Оценить по фото</a>
+                <a href="#contact" class="button button-accent">Оценить по фото</a>
                 <a href="#config" class="button button-light">Подобрать покрытие</a>
             </div>
 
@@ -278,7 +278,7 @@
                         </span>
                         <span>
                             <strong>Добавить фото дисков</strong>
-                            <small id="photoHelp">JPG, PNG, WebP, HEIC или AVIF · до 25 МБ</small>
+                            <small id="photoHelp">JPG, PNG, WebP, HEIC или AVIF · до 5 МБ</small>
                         </span>
                         <span class="photo-picker-action">Выбрать</span>
                     </label>
@@ -428,9 +428,9 @@
             const file = photoInput.files?.[0];
             if (!file) return clearPhotoPreview();
 
-            if (file.size > 25 * 1024 * 1024) {
+            if (file.size > 5 * 1024 * 1024) {
                 clearPhotoPreview();
-                leadStatus.textContent = 'Размер фотографии не должен превышать 25 МБ.';
+                leadStatus.textContent = 'Размер фотографии не должен превышать 5 МБ.';
                 leadStatus.className = 'form-message form-message-error';
                 leadStatus.hidden = false;
                 return;

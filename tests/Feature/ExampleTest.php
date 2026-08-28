@@ -20,7 +20,8 @@ class ExampleTest extends TestCase
             ->assertOk()
             ->assertSee('НСК Макстар')
             ->assertSee('Подберите размер и покрытие')
-            ->assertSee('Шесть спокойных автомобильных оттенков');
+            ->assertSee('Шесть спокойных автомобильных оттенков')
+            ->assertSee('href="#contact" class="button button-accent">Оценить по фото</a>', false);
     }
 
     public function test_valid_lead_is_sent_to_both_emails_and_max_with_photo(): void
@@ -47,7 +48,7 @@ class ExampleTest extends TestCase
             'name' => 'Иван Петров',
             'phone' => '+7 (999) 000-00-00',
             'message' => 'Нужна покраска комплекта дисков.',
-            'photo' => UploadedFile::fake()->create('diski.jpg', 100, 'image/jpeg'),
+            'photo' => UploadedFile::fake()->create('diski.jpg', 5120, 'image/jpeg'),
         ], ['Accept' => 'application/json', 'X-Requested-With' => 'XMLHttpRequest']);
 
         $response
@@ -67,6 +68,22 @@ class ExampleTest extends TestCase
             && $request->hasHeader('Authorization', 'max-test-token')
             && data_get($request->data(), 'attachments.0.payload.token') === 'image-token'
         );
+    }
+
+    public function test_photo_larger_than_five_megabytes_is_rejected(): void
+    {
+        Mail::fake();
+
+        $response = $this->postJson(route('lead.send'), [
+            'phone' => '+7 (999) 000-00-00',
+            'photo' => UploadedFile::fake()->create('too-large.jpg', 5121, 'image/jpeg'),
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('photo');
+
+        Mail::assertNothingSent();
     }
 
     public function test_phone_number_requires_at_least_seven_digits(): void
