@@ -28,6 +28,7 @@ class LeadController extends Controller
             'phone.regex' => 'Проверьте формат номера телефона.',
             'photo.mimes' => 'Фото должно быть в формате JPG, PNG, WebP, HEIC или AVIF.',
             'photo.max' => 'Размер фотографии не должен превышать 5 МБ.',
+            'photo.uploaded' => 'Не удалось загрузить фотографию. Попробуйте выбрать файл ещё раз.',
         ]);
 
         if ($request->filled('website')) {
