@@ -11,10 +11,15 @@ RUN apt-get update \
         git unzip \
         libzip-dev libicu-dev libonig-dev libsqlite3-dev \
         libcurl4-openssl-dev libssl-dev \
-    && docker-php-ext-install -j"$(nproc)" \
-        pdo pdo_sqlite mbstring intl zip opcache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Расширения — каждый в своём шаге, без параллелизма (иначе гонка при сборке)
+RUN docker-php-ext-install pdo_sqlite
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-install intl
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install opcache
 
 # ---- apache: корень на public, модули --------------------
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
