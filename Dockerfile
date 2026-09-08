@@ -2,7 +2,7 @@
 #  Dockerfile — Diski_polimer (Laravel 12) для Render
 #  Ветка деплоя: codex/audit-and-hardening
 # =========================================================
-FROM php:8.5-apache
+FROM php:8.4-apache
 
 # ---- системные пакеты + PHP-расширения -------------------
 ENV DEBIAN_FRONTEND=noninteractive
