@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git unzip \
-        libzip-dev libicu-dev libonig-dev \
+        libzip-dev libicu-dev libonig-dev libsqlite3-dev \
         libcurl4-openssl-dev libssl-dev \
     && docker-php-ext-install -j"$(nproc)" \
         pdo pdo_sqlite mbstring intl zip opcache \
