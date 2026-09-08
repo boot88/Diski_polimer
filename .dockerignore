@@ -1,0 +1,16 @@
+# локальные секреты и мусор — НЕ копируются в образ
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+node_modules
+vendor
+diski-build.tar.gz
+*.log
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/*
+.DS_Store
