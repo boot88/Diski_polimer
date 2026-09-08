@@ -19,7 +19,6 @@ RUN docker-php-ext-install pdo_sqlite
 RUN docker-php-ext-install mbstring
 RUN docker-php-ext-install intl
 RUN docker-php-ext-install zip
-RUN docker-php-ext-install opcache
 
 # ---- apache: корень на public, модули --------------------
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
