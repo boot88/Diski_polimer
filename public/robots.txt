@@ -1,2 +1,4 @@
 User-agent: *
 Disallow:
+
+Sitemap: https://www.maxtar-nsk.ru/sitemap.xml

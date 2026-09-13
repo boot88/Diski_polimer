@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-design="classic">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,12 +11,28 @@
     <link rel="alternate icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="preload" as="image" type="image/webp" href="{{ asset('images/brand/hero-workshop.webp') }}" fetchpriority="high">
 
+    <script>
+        (() => {
+            let design = 'classic';
+            const requested = new URLSearchParams(location.search).get('design');
+            try { design = localStorage.getItem('maxtar-design') || design; } catch {}
+            if (requested === 'modern' || requested === 'classic') design = requested;
+            document.documentElement.dataset.design = design === 'modern' ? 'modern' : 'classic';
+        })();
+    </script>
+    <link rel="canonical" href="{{ rtrim(config('app.url'), '/') }}/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MAXTAR — порошковая покраска дисков">
+    <meta property="og:description" content="Новый характер ваших дисков. Подбор покрытия и оценка по фото. Бердск, пер. Промышленный, 2а/4.">
+    <meta property="og:url" content="{{ rtrim(config('app.url'), '/') }}/">
+    <meta property="og:image" content="{{ asset('images/brand/hero-workshop.webp') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script type="application/ld+json">{!! json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'AutomotiveBusiness',
         'name' => 'НСК Макстар',
+        'url' => rtrim(config('app.url'), '/').'/',
         'description' => 'Порошковая покраска и восстановление автомобильных дисков.',
         'telephone' => '+79138954525',
         'email' => 'polimer@happypils.ru',
@@ -40,11 +56,13 @@
 
         ym(106844214, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
     </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/106844214" class="metric-pixel" alt=""></div></noscript>
+
     <!-- /Yandex.Metrika counter -->
 </head>
 
 <body class="site-body">
+<noscript><div><img src="https://mc.yandex.ru/watch/106844214" class="metric-pixel" alt=""></div></noscript>
+<a href="#top" class="skip-link">Перейти к содержимому</a>
 <header class="site-header">
     <nav class="container-wide nav-shell" aria-label="Основная навигация">
         <a href="#top" class="brand" aria-label="НСК Макстар — на главную">
@@ -52,7 +70,7 @@
                 <img src="{{ asset('images/brand/logo-mark.svg') }}" alt="" width="42" height="42">
             </span>
             <span class="brand-copy">
-                <strong>НСК Макстар</strong>
+                <strong><span class="classic-copy">НСК Макстар</span><span class="modern-copy wordmark">MAXTAR<span class="wordmark-dot" aria-hidden="true">●</span></span></strong>
                 <small>Покраска дисков · Бердск</small>
             </span>
         </a>
@@ -88,7 +106,7 @@
     </div>
 </header>
 
-<main id="top">
+<main id="top" tabindex="-1">
     @yield('content')
 </main>
 
@@ -100,7 +118,7 @@
                     <img src="{{ asset('images/brand/logo-mark.svg') }}" alt="" width="42" height="42">
                 </span>
                 <span class="brand-copy">
-                    <strong>НСК Макстар</strong>
+                    <strong><span class="classic-copy">НСК Макстар</span><span class="modern-copy wordmark">MAXTAR<span class="wordmark-dot" aria-hidden="true">●</span></span></strong>
                     <small>Порошковая покраска дисков</small>
                 </span>
             </a>
@@ -131,6 +149,14 @@
         <span>© {{ date('Y') }} НСК Макстар</span>
         <span>Порошковая покраска · Бердск</span>
     </div>
+    <div class="container-wide design-switcher" role="group" aria-label="Дизайн сайта">
+        <span>Дизайн сайта</span>
+        <div class="design-options">
+            <button type="button" data-design-choice="classic" aria-pressed="true">Текущий</button>
+            <button type="button" data-design-choice="modern" aria-pressed="false">Новый · MAXTAR <span aria-hidden="true">↗</span></button>
+        </div>
+        <a href="#top">Наверх ↑</a>
+    </div>
 </footer>
 
 <div class="mobile-action-bar" aria-label="Быстрые действия">
@@ -138,86 +164,6 @@
     <a href="#contact" class="button button-accent">Оценить по фото</a>
 </div>
 
-<script>
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const pageBody = document.body;
 
-    if (mobileBtn && mobileMenu) {
-        const closeMobileMenu = () => {
-            mobileMenu.hidden = true;
-            pageBody.classList.remove('menu-open');
-            mobileBtn.setAttribute('aria-expanded', 'false');
-            mobileBtn.setAttribute('aria-label', 'Открыть меню');
-        };
-
-        mobileBtn.addEventListener('click', () => {
-            const willOpen = mobileMenu.hidden;
-            mobileMenu.hidden = !willOpen;
-            pageBody.classList.toggle('menu-open', willOpen);
-            mobileBtn.setAttribute('aria-expanded', String(willOpen));
-            mobileBtn.setAttribute('aria-label', willOpen ? 'Закрыть меню' : 'Открыть меню');
-        });
-
-        mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
-    }
-
-    let scrollAnimationFrame = null;
-
-    const smoothScrollTo = target => {
-        if (scrollAnimationFrame) window.cancelAnimationFrame(scrollAnimationFrame);
-
-        const scrollPadding = Number.parseFloat(
-            window.getComputedStyle(document.documentElement).scrollPaddingTop
-        ) || 0;
-        const startPosition = window.scrollY;
-        const targetPosition = Math.max(
-            0,
-            target.getBoundingClientRect().top + startPosition - scrollPadding
-        );
-        const distance = targetPosition - startPosition;
-        const duration = Math.min(850, Math.max(550, Math.abs(distance) * 0.35));
-        const startedAt = window.performance.now();
-
-        const animate = currentTime => {
-            const progress = Math.min((currentTime - startedAt) / duration, 1);
-            const easedProgress = progress < 0.5
-                ? 4 * progress ** 3
-                : 1 - ((-2 * progress + 2) ** 3) / 2;
-
-            window.scrollTo(0, startPosition + distance * easedProgress);
-
-            if (progress < 1) {
-                scrollAnimationFrame = window.requestAnimationFrame(animate);
-            } else {
-                scrollAnimationFrame = null;
-                target.focus({ preventScroll: true });
-            }
-        };
-
-        scrollAnimationFrame = window.requestAnimationFrame(animate);
-    };
-
-    document.querySelectorAll('a[href^="#"]:not([data-photo-trigger])').forEach(link => {
-        link.addEventListener('click', event => {
-            const hash = link.getAttribute('href');
-            const target = hash && hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
-            if (!target) return;
-
-            event.preventDefault();
-            smoothScrollTo(target);
-            window.history.replaceState(null, '', hash);
-        });
-    });
-
-    document.querySelectorAll('[data-photo-trigger]').forEach(trigger => {
-        trigger.addEventListener('click', event => {
-            const input = document.getElementById('photoInput');
-            if (!input) return;
-            event.preventDefault();
-            input.click();
-        });
-    });
-</script>
 </body>
 </html>

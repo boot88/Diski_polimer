@@ -1,4 +1,6 @@
-import '../css/app.css';
+import './home.js';
+import './navigation.js';
+import '../css/modern.css';
 
 const revealItems = [
     ...document.querySelectorAll(

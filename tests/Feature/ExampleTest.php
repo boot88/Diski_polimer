@@ -56,15 +56,12 @@ class ExampleTest extends TestCase
             ->assertJsonPath('status', 'ok');
 
         Mail::assertSent(LeadRequestMail::class, 2);
-        Mail::assertSent(LeadRequestMail::class, fn (LeadRequestMail $mail) =>
-            $mail->hasTo('first@example.test') && $mail->photo['name'] === 'diski.jpg'
+        Mail::assertSent(LeadRequestMail::class, fn (LeadRequestMail $mail) => $mail->hasTo('first@example.test') && $mail->photo['name'] === 'diski.jpg'
         );
-        Mail::assertSent(LeadRequestMail::class, fn (LeadRequestMail $mail) =>
-            $mail->hasTo('second@example.test') && $mail->photo['name'] === 'diski.jpg'
+        Mail::assertSent(LeadRequestMail::class, fn (LeadRequestMail $mail) => $mail->hasTo('second@example.test') && $mail->photo['name'] === 'diski.jpg'
         );
 
-        Http::assertSent(fn ($request) =>
-            str_contains($request->url(), 'platform-api2.max.ru/messages?user_id=123456789')
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'platform-api2.max.ru/messages?user_id=123456789')
             && $request->hasHeader('Authorization', 'max-test-token')
             && data_get($request->data(), 'attachments.0.payload.token') === 'image-token'
         );
@@ -99,5 +96,77 @@ class ExampleTest extends TestCase
             ->assertJsonValidationErrors('phone');
 
         Mail::assertNothingSent();
+    }
+
+    public function test_honeypot_does_not_send_any_notifications(): void
+    {
+        Mail::fake();
+        Http::fake();
+        $this->postJson(route('lead.send'), ['website' => 'spam'])->assertOk();
+        Mail::assertNothingSent();
+        Http::assertNothingSent();
+    }
+
+    public function test_unavailable_delivery_does_not_report_success(): void
+    {
+        Mail::fake();
+        Http::fake();
+        config()->set('mail.default', 'array');
+        config()->set('services.max.access_token', null);
+        $this->postJson(route('lead.send'), ['phone' => '+79130000000'])
+            ->assertStatus(503);
+        Mail::assertNothingSent();
+    }
+
+    public function test_selection_is_validated_and_included_in_email(): void
+    {
+        Mail::fake();
+        Http::fake();
+        config()->set('mail.default', 'smtp');
+        config()->set('mail.lead_to_addresses', ['first@example.test', 'first@example.test']);
+        config()->set('services.max.access_token', null);
+        $this->postJson(route('lead.send'), [
+            'phone' => '+79130000000', 'size' => 'R17', 'finish' => 'bronze',
+        ])->assertOk();
+        Mail::assertSent(LeadRequestMail::class, 1);
+        Mail::assertSent(LeadRequestMail::class, fn ($mail) => $mail->lead['size'] === 'R17' && $mail->lead['finish'] === 'Тёмная бронза'
+        );
+        $this->postJson(route('lead.send'), [
+            'phone' => '+79130000000', 'size' => 'R999', 'finish' => '<script>',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['size', 'finish']);
+    }
+
+    public function test_max_upload_failure_falls_back_to_text_with_correct_photo_notice(): void
+    {
+        Mail::fake();
+        config()->set('mail.default', 'smtp');
+        config()->set('mail.lead_to_addresses', ['first@example.test']);
+        config()->set('services.max.access_token', 'test-token');
+        config()->set('services.max.user_id', '123');
+        config()->set('app.url', 'https://www.maxtar-nsk.ru');
+        Http::fake([
+            'platform-api2.max.ru/uploads*' => Http::response([], 500),
+            'platform-api2.max.ru/messages*' => Http::response(['message' => ['id' => '1']]),
+        ]);
+        $this->postJson(route('lead.send'), [
+            'phone' => '+79130000000',
+            'photo' => UploadedFile::fake()->create('disk.jpg', 100, 'image/jpeg'),
+        ])->assertOk();
+        Http::assertSent(fn ($request) => str_contains($request->url(), '/messages?')
+            && str_contains($request['text'], 'не прикреплено в MAX')
+            && str_contains($request['text'], 'https://www.maxtar-nsk.ru/')
+            && $request['attachments'] === []
+        );
+    }
+
+    public function test_email_escapes_user_input_once(): void
+    {
+        $html = (new LeadRequestMail([
+            'name' => 'Иван & Анна <test>', 'phone' => '+79130000000',
+            'message' => '<script>alert(1)</script>', 'created_at' => '12.09.2026 12:00',
+        ]))->render();
+        $this->assertStringContainsString('Иван &amp; Анна &lt;test&gt;', $html);
+        $this->assertStringNotContainsString('&amp;amp;', $html);
+        $this->assertStringNotContainsString('<script>alert', $html);
     }
 }

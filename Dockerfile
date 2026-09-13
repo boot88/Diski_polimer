@@ -31,9 +31,10 @@ RUN a2enmod rewrite headers \
 # ---- копируем проект -------------------------------------
 WORKDIR /var/www/html
 COPY . .
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # ---- права на служебные каталоги (до composer-скриптов) ---
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache public \
     && chmod -R ug+rwX storage bootstrap/cache
 

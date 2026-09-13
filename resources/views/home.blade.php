@@ -9,12 +9,18 @@
          height="900"
          fetchpriority="high">
     <div class="hero-overlay"></div>
+    <div class="modern-hero-art modern-copy" aria-hidden="true">
+        <span class="hero-orbit"></span><span class="hero-art-word">MAXTAR</span>
+        <div class="hero-wheel" style="--hero-wheel-image: url('{{ asset($sizes[2]['image']) }}')"></div>
+        <span class="hero-art-label">POWDER COATING / R15—R19</span>
+        <span class="hero-art-note">Ваш стиль.<br>В каждой детали.</span>
+    </div>
 
     <div class="container-wide hero-content">
         <div class="hero-copy">
-            <p class="eyebrow eyebrow-light"><span></span> Порошковая покраска · Бердск</p>
-            <h1 id="hero-title">Возвращаем дискам точную форму и <em>сильное покрытие</em></h1>
-            <p class="hero-lead">Полная подготовка поверхности, порошковая окраска и контроль финиша. Работаем с комплектами R15–R19 и подбираем оттенок под автомобиль.</p>
+            <p class="eyebrow eyebrow-light"><span></span> НСК Макстар · Бердск / Новосибирск</p>
+            <h1 id="hero-title"><span class="classic-copy">Возвращаем дискам точную форму и <em>сильное покрытие</em></span><span class="modern-copy">Те же диски.<br>Совсем другой<br><em>характер.</em></span></h1>
+            <p class="hero-lead">Порошковая покраска дисков в Бердске. От спокойного серебра до выразительного графита — подберём покрытие под ваш автомобиль.</p>
 
             <div class="hero-actions">
                 <a href="#contact" class="button button-accent">Оценить по фото</a>
@@ -22,7 +28,7 @@
             </div>
 
             <div class="hero-meta" aria-label="Основные условия">
-                <div><strong>от 14 400 ₽</strong><span>комплект из 4 дисков</span></div>
+                <div><strong>от {{ number_format($sizes[0]['price'], 0, ',', ' ') }} ₽</strong><span>комплект из 4 дисков</span></div>
                 <div><strong>R15–R19</strong><span>легковые диски</span></div>
                 <div><strong>Бердск</strong><span>пер. Промышленный, 2а/4</span></div>
             </div>
@@ -96,7 +102,7 @@
             <div class="config-copy">
                 <p class="eyebrow"><span></span> Визуальный подбор</p>
                 <h2>Подберите размер и покрытие</h2>
-                <p>Теперь для R15, R17 и R19 используются разные модели дисков. Цветовая визуализация показывает характер оттенка, но итог зависит от освещения и фактуры металла.</p>
+                <p>Выберите диаметр и оттенок. Посмотрите сочетание и узнайте предварительную стоимость комплекта из четырёх дисков. Реальный цвет согласуем по образцу.</p>
 
                 <fieldset class="selector-group">
                     <legend>1. Размер и модель</legend>
@@ -129,7 +135,7 @@
                 </fieldset>
 
                 <div class="config-price">
-                    <div><span>Ориентир за комплект</span><strong id="priceLabel">14 400 ₽</strong></div>
+                    <div><span>Ориентир за комплект</span><strong id="priceLabel" aria-live="polite">{{ number_format($sizes[0]['price'], 0, ',', ' ') }} ₽</strong></div>
                     <p>Точная цена зависит от состояния, ширины диска, сложности цвета и дополнительных работ.</p>
                 </div>
             </div>
@@ -146,7 +152,7 @@
                          alt="Диск R15 в покрытии Серебро OEM"
                          class="wheel-visual tone-{{ $finishes[0]['tone'] }}"
                          width="960"
-                         height="960">
+                         height="960" loading="lazy" decoding="async">
                 </div>
                 <div class="wheel-stage-bottom">
                     <div><span>Размер</span><strong id="sizeTag">{{ $sizes[0]['label'] }}</strong></div>
@@ -182,7 +188,7 @@
                              class="tone-{{ $finish['tone'] }}"
                              width="960"
                              height="960"
-                             loading="lazy">
+                             loading="lazy" decoding="async">
                     </div>
                     <div class="coating-info">
                         <div><p>{{ $gallerySize['label'] }} · {{ $gallerySize['name'] }}</p><h3>{{ $finish['name'] }}</h3></div>
@@ -202,9 +208,9 @@
             <h2>Цена зависит от работы, а не только от диаметра</h2>
         </div>
         <div class="pricing-list">
-            <div><span>R15 · комплект</span><strong>от 14 400 ₽</strong></div>
-            <div><span>R17 · комплект</span><strong>от 16 400 ₽</strong></div>
-            <div><span>R19 · комплект</span><strong>от 18 400 ₽</strong></div>
+            @foreach($sizes as $size)
+                <div><span>{{ $size['label'] }} · комплект</span><strong>от {{ number_format($size['price'], 0, ',', ' ') }} ₽</strong></div>
+            @endforeach
             <p>На расчёт влияют слой старого покрытия, коррозия, сложность изделия, размер и выбранный финиш.</p>
         </div>
     </div>
@@ -246,22 +252,22 @@
                 </div>
             @endif
 
-            <div id="leadFormStatus" class="form-message" hidden></div>
+            <div id="leadFormStatus" class="form-message" role="status" aria-live="polite" tabindex="-1" hidden></div>
 
             <form id="leadForm" class="lead-form" method="POST" action="{{ route('lead.send') }}" enctype="multipart/form-data">
                 @csrf
-                <input class="honeypot-field" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <input aria-label="Оставьте поле пустым" class="honeypot-field" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <label>
                     <span>Имя</span>
-                    <input name="name" value="{{ old('name') }}" autocomplete="name" placeholder="Как к вам обращаться">
+                    <input name="name" maxlength="80" value="{{ old('name') }}" autocomplete="name" placeholder="Как к вам обращаться">
                 </label>
                 <label>
                     <span>Телефон *</span>
-                    <input name="phone" value="{{ old('phone') }}" required inputmode="tel" autocomplete="tel" placeholder="+7 913 000-00-00">
+                    <input name="phone" type="tel" maxlength="32" value="{{ old('phone') }}" required inputmode="tel" autocomplete="tel" placeholder="+7 913 000-00-00">
                 </label>
                 <label>
                     <span>Размер, цвет, состояние</span>
-                    <textarea name="message" rows="4" placeholder="Например: R17, графит, есть сколы и коррозия">{{ old('message') }}</textarea>
+                    <textarea name="message" maxlength="3000" rows="4" placeholder="Например: R17, графит, есть сколы и коррозия">{{ old('message') }}</textarea>
                 </label>
                 <div id="photo" class="photo-field">
                     <input id="photoInput"
@@ -278,12 +284,12 @@
                         </span>
                         <span>
                             <strong>Добавить фото дисков</strong>
-                            <small id="photoHelp">JPG, PNG, WebP, HEIC или AVIF · до 5 МБ · большие фото уменьшаются автоматически</small>
+                            <small id="photoHelp">JPG, PNG, WebP, HEIC или AVIF · исходник до 25 МБ, уменьшаем до 5 МБ для отправки</small>
                         </span>
                         <span class="photo-picker-action">Выбрать</span>
                     </label>
-                    <div id="photoPreview" class="photo-preview" hidden>
-                        <img id="photoPreviewImage" src="" alt="Предпросмотр выбранного фото">
+                    <div id="photoPreview" class="photo-preview" aria-live="polite" hidden>
+                        <img id="photoPreviewImage" width="72" height="72" alt="Предпросмотр выбранного фото">
                         <div>
                             <strong id="photoState">Фото выбрано</strong>
                             <span id="photoFileName"></span>
@@ -320,265 +326,5 @@
     </div>
 </section>
 
-<script>
-    const SIZES = @json($sizes);
-    const FINISHES = @json($finishes);
-    const ASSET_BASE = @json(rtrim(asset(''), '/'));
-    const TONE_CLASSES = FINISHES.map(finish => `tone-${finish.tone}`);
-
-    let activeSize = 0;
-    let activeFinish = 0;
-
-    const wheelImg = document.getElementById('wheelImg');
-    const sizeTag = document.getElementById('sizeTag');
-    const finishTag = document.getElementById('finishTag');
-    const modelTag = document.getElementById('modelTag');
-    const priceLabel = document.getElementById('priceLabel');
-
-    function joinUrl(base, path) {
-        try {
-            return new URL(path, base.endsWith('/') ? base : `${base}/`).toString();
-        } catch (error) {
-            return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
-        }
-    }
-
-    function setSelectedButtons(selector, selectedButton) {
-        document.querySelectorAll(selector).forEach(button => {
-            const isSelected = button === selectedButton;
-            button.classList.toggle('is-active', isSelected);
-            button.setAttribute('aria-pressed', String(isSelected));
-        });
-    }
-
-    function renderPreview() {
-        const size = SIZES[activeSize];
-        const finish = FINISHES[activeFinish];
-
-        wheelImg.src = joinUrl(ASSET_BASE, size.image);
-        wheelImg.classList.remove(...TONE_CLASSES);
-        wheelImg.classList.add(`tone-${finish.tone}`);
-        wheelImg.alt = `Диск ${size.label} в покрытии ${finish.name}`;
-
-        sizeTag.textContent = size.label;
-        finishTag.textContent = finish.name;
-        modelTag.textContent = `${size.label} · ${size.name}`;
-        priceLabel.textContent = `${new Intl.NumberFormat('ru-RU').format(size.price)} ₽`;
-    }
-
-    document.querySelectorAll('[data-size-index]').forEach(button => {
-        button.addEventListener('click', () => {
-            activeSize = Number(button.dataset.sizeIndex);
-            setSelectedButtons('[data-size-index]', button);
-            renderPreview();
-        });
-    });
-
-    document.querySelectorAll('[data-finish-index]').forEach(button => {
-        button.addEventListener('click', () => {
-            activeFinish = Number(button.dataset.finishIndex);
-            setSelectedButtons('[data-finish-index]', button);
-            renderPreview();
-        });
-    });
-
-    const coatingSlider = document.getElementById('coatingSlider');
-    document.querySelectorAll('[data-slider-direction]').forEach(button => {
-        button.addEventListener('click', () => {
-            if (!coatingSlider) return;
-            coatingSlider.scrollBy({
-                left: Number(button.dataset.sliderDirection) * Math.min(coatingSlider.clientWidth * 0.86, 760),
-                behavior: 'smooth',
-            });
-        });
-    });
-
-    document.querySelectorAll('[data-coating-index]').forEach(button => {
-        button.addEventListener('click', () => {
-            const finishButton = document.querySelector(`[data-finish-index="${button.dataset.coatingIndex}"]`);
-            const sizeButton = document.querySelector(`[data-size-index="${button.dataset.gallerySizeIndex}"]`);
-            if (sizeButton) sizeButton.click();
-            if (finishButton) finishButton.click();
-            document.getElementById('config').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    });
-
-    const leadForm = document.getElementById('leadForm');
-    const leadStatus = document.getElementById('leadFormStatus');
-    const leadBtnText = document.getElementById('leadFormBtnText');
-    const leadSpinner = document.getElementById('leadFormSpinner');
-    const photoInput = document.getElementById('photoInput');
-    const photoPreview = document.getElementById('photoPreview');
-    const photoPreviewImage = document.getElementById('photoPreviewImage');
-    const photoFileName = document.getElementById('photoFileName');
-    const photoRemove = document.getElementById('photoRemove');
-    let photoObjectUrl = null;
-
-    const clearPhotoPreview = () => {
-        if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
-        photoObjectUrl = null;
-        if (photoInput) photoInput.value = '';
-        if (photoPreviewImage) photoPreviewImage.removeAttribute('src');
-        if (photoFileName) photoFileName.textContent = '';
-        if (photoPreview) photoPreview.hidden = true;
-    };
-
-    if (photoInput && photoPreview && photoPreviewImage && photoFileName) {
-        photoInput.addEventListener('change', () => {
-            const file = photoInput.files?.[0];
-            if (!file) return clearPhotoPreview();
-
-            if (file.size > 5 * 1024 * 1024) {
-                clearPhotoPreview();
-                leadStatus.textContent = 'Размер фотографии не должен превышать 5 МБ.';
-                leadStatus.className = 'form-message form-message-error';
-                leadStatus.hidden = false;
-                return;
-            }
-
-            if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
-            photoObjectUrl = URL.createObjectURL(file);
-            photoPreviewImage.src = photoObjectUrl;
-            photoFileName.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} МБ`;
-            photoPreview.hidden = false;
-            document.getElementById('photo')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-    }
-
-    photoRemove?.addEventListener('click', clearPhotoPreview);
-
-    async function decodePhoto(file) {
-        if ('createImageBitmap' in window) {
-            try {
-                const bitmap = await createImageBitmap(file);
-
-                return {
-                    source: bitmap,
-                    width: bitmap.width,
-                    height: bitmap.height,
-                    release: () => bitmap.close(),
-                };
-            } catch (error) {
-                // Safari can decode some iPhone formats through an Image element instead.
-            }
-        }
-
-        const objectUrl = URL.createObjectURL(file);
-
-        return new Promise((resolve, reject) => {
-            const image = new Image();
-
-            image.onload = () => resolve({
-                source: image,
-                width: image.naturalWidth,
-                height: image.naturalHeight,
-                release: () => URL.revokeObjectURL(objectUrl),
-            });
-            image.onerror = () => {
-                URL.revokeObjectURL(objectUrl);
-                reject(new Error('Не удалось открыть выбранное фото.'));
-            };
-            image.src = objectUrl;
-        });
-    }
-
-    async function preparePhotoForUpload(file) {
-        const safeUploadSize = 1500 * 1024;
-
-        if (!file || file.size <= safeUploadSize) return file;
-
-        let decodedPhoto;
-
-        try {
-            decodedPhoto = await decodePhoto(file);
-            let maxSide = 1920;
-            let quality = 0.82;
-            let preparedBlob = null;
-
-            for (let attempt = 0; attempt < 5; attempt += 1) {
-                const scale = Math.min(1, maxSide / Math.max(decodedPhoto.width, decodedPhoto.height));
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.max(1, Math.round(decodedPhoto.width * scale));
-                canvas.height = Math.max(1, Math.round(decodedPhoto.height * scale));
-
-                const context = canvas.getContext('2d', { alpha: false });
-                if (!context) throw new Error('Браузер не поддерживает подготовку фото.');
-
-                context.drawImage(decodedPhoto.source, 0, 0, canvas.width, canvas.height);
-                preparedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-
-                if (preparedBlob && preparedBlob.size <= safeUploadSize) break;
-
-                maxSide = Math.round(maxSide * 0.82);
-                quality = Math.max(0.58, quality - 0.07);
-            }
-
-            if (!preparedBlob || preparedBlob.size > 1800 * 1024) {
-                throw new Error('Не удалось уменьшить фотографию для отправки.');
-            }
-
-            const baseName = file.name.replace(/\.[^.]+$/, '') || 'diski';
-
-            return new File([preparedBlob], `${baseName}.jpg`, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-            });
-        } catch (error) {
-            throw new Error('Не удалось подготовить фото. Сохраните его как JPG или сделайте снимок экрана и загрузите снова.');
-        } finally {
-            decodedPhoto?.release();
-        }
-    }
-
-    if (leadForm && leadStatus && leadBtnText && leadSpinner) {
-        leadForm.addEventListener('submit', async event => {
-            event.preventDefault();
-            const submitButton = leadForm.querySelector('button[type="submit"]');
-
-            leadStatus.hidden = true;
-            leadStatus.className = 'form-message';
-            if (submitButton) submitButton.disabled = true;
-            leadBtnText.textContent = 'Отправляем…';
-            leadSpinner.hidden = false;
-
-            try {
-                const formData = new FormData(leadForm);
-                const originalPhoto = photoInput?.files?.[0];
-                if (originalPhoto) {
-                    const preparedPhoto = await preparePhotoForUpload(originalPhoto);
-                    formData.set('photo', preparedPhoto, preparedPhoto.name);
-                }
-
-                const response = await fetch(leadForm.action, {
-                    method: 'POST',
-                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
-                    body: formData,
-                });
-                const isJson = (response.headers.get('content-type') || '').includes('application/json');
-                const data = isJson ? await response.json() : {};
-
-                if (!response.ok) {
-                    const errors = data.errors ? Object.values(data.errors).flat().join(' ') : null;
-                    throw new Error(errors || data.message || 'Не удалось отправить заявку. Позвоните нам или попробуйте ещё раз.');
-                }
-
-                leadStatus.textContent = data.message || 'Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
-                leadStatus.classList.add('form-message-success');
-                leadStatus.hidden = false;
-                leadForm.reset();
-                clearPhotoPreview();
-            } catch (error) {
-                leadStatus.textContent = error.message || 'Ошибка соединения. Попробуйте ещё раз.';
-                leadStatus.classList.add('form-message-error');
-                leadStatus.hidden = false;
-            } finally {
-                if (submitButton) submitButton.disabled = false;
-                leadBtnText.textContent = 'Отправить заявку';
-                leadSpinner.hidden = true;
-            }
-        });
-    }
-
-    renderPreview();
-</script>
+<script id="wheelConfig" type="application/json">{!! json_encode(['sizes' => $sizes, 'finishes' => $finishes, 'assetBase' => rtrim(asset(''), '/')], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
 @endsection

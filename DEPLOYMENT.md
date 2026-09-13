@@ -2,12 +2,12 @@
 
 ## Что хранится в Git и что остаётся на сервере
 
-Git хранит исходный код, шаблоны, конфигурацию Vite и изображения проекта. Не отправляйте в Git `.env`, `vendor`, `database/database.sqlite`, `storage` и `public/build`:
+Git хранит исходный код, шаблоны, конфигурацию Vite и изображения проекта. Не отправляйте в Git `.env`, `vendor`, `database/database.sqlite` и рабочие данные `storage`. В этой ветке `public/build` уже отслеживается Git и обновляется вместе с исходниками:
 
 - `.env` содержит ключ Laravel и почтовые пароли;
 - `database/database.sqlite` содержит данные сайта;
 - `storage/app` содержит загруженные посетителями файлы;
-- `public/build` — готовые CSS/JS-файлы, созданные Vite;
+- `public/build` — готовые CSS/JS-файлы Vite; обязательно запускайте `npm ci && npm run build` перед коммитом изменений интерфейса;
 - `vendor` — PHP-зависимости Composer.
 
 ## Первый переход на Git-деплой
@@ -84,6 +84,7 @@ scp /tmp/diski-polimer-build.tar.gz p610780@happypils.ru:/var/www/p610780/data/w
 ```bash
 cd /var/www/p610780/data/www/happypils.ru/Diski_polimer
 git pull --ff-only origin YOUR_BRANCH
+composer install --no-dev --no-interaction --optimize-autoloader
 tar -xzf diski-polimer-build.tar.gz
 rm -f public/hot
 /usr/bin/php82 artisan optimize:clear
@@ -96,7 +97,7 @@ rm -f public/hot
 ```dotenv
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=http://happypils.ru/Diski_polimer/public
+APP_URL=https://www.maxtar-nsk.ru
 
 MAIL_MAILER=smtp
 MAIL_HOST=...
@@ -114,3 +115,13 @@ LEAD_TO_EMAIL=...
 ```bash
 /usr/bin/php82 artisan config:clear
 ```
+
+## Новый домен www.maxtar-nsk.ru
+
+Корень виртуального хоста должен указывать на `Diski_polimer/public`, а не на корень репозитория.
+Установите HTTPS-сертификат и `APP_URL=https://www.maxtar-nsk.ru`. Не меняйте рабочий
+`APP_KEY`: он используется для существующих сессий. После изменения домена очистите кэш.
+Веб-сервер должен отдавать существующие файлы (в том числе `/sitemap.xml`) напрямую,
+а остальные запросы направлять в `public/index.php`.
+Для формы задайте `upload_max_filesize=5M`, `post_max_size=8M` (и лимит тела запроса
+веб-сервера не ниже 8 МБ). `MAIL_TIMEOUT=15` ограничивает ожидание SMTP.

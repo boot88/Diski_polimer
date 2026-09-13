@@ -23,16 +23,22 @@
                     <tr>
                         <td style="padding:4px 0;width:120px;color:#6b7280;">Имя:</td>
                         <td style="padding:4px 0;">
-                            {{ $lead['name'] ? e($lead['name']) : '—' }}
+                            {{ $lead['name'] ?: '—' }}
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:4px 0;width:120px;color:#6b7280;">Телефон:</td>
                         <td style="padding:4px 0;">
-                            {{ e($lead['phone'] ?? '') }}
+                            {{ $lead['phone'] ?? '' }}
                         </td>
                     </tr>
 
+                    @if(!empty($lead['size']) || !empty($lead['finish']))
+                        <tr>
+                            <td style="padding:8px 0;width:120px;color:#6b7280;">Подбор:</td>
+                            <td>{{ $lead['size'] ?? '' }} · {{ $lead['finish'] ?? '' }}</td>
+                        </tr>
+                    @endif
                     @if(!empty($lead['message']))
                         <tr>
                             <td style="padding:8px 0 0;width:120px;color:#6b7280;vertical-align:top;">Комментарий:</td>
@@ -45,7 +51,7 @@
                         <tr>
                             <td style="padding:8px 0 0;width:120px;color:#6b7280;vertical-align:top;">Фото:</td>
                             <td style="padding:8px 0 0;">
-                                {{ e($lead['photo_name']) }} — приложено к письму
+                                {{ $lead['photo_name'] }} — приложено к письму
                             </td>
                         </tr>
                     @endif
